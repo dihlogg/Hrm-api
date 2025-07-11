@@ -2,49 +2,52 @@ import {
   Controller,
   Get,
   Post,
-  Patch,
   Delete,
   Body,
   Param,
+  Put,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 
 @ApiTags('Users')
 @Controller('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create user' })
-  @ApiResponse({ status: 201, description: 'The user has been created.' })
-  create(@Body() dto: CreateUserDto) {
-    return this.usersService.create(dto);
+  //get all users
+  @Get('GetAllUsers')
+  async findAll(): Promise<User[]> {
+    return await this.usersService.findAll();
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  findAll() {
-    return this.usersService.findAll();
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get user by ID' })
-  findOne(@Param('id') id: string) {
+  //get user by id
+  @Get('GetUserById/:id')
+  async findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(id);
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update user' })
-  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
-    return this.usersService.update(id, dto);
+  //create user
+  @Post('PostUser')
+  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return await this.usersService.create(createUserDto);
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete user' })
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  //update user
+  @Put('PostUser/:id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<boolean> {
+    return this.usersService.update(id, updateUserDto);
+  }
+
+  //delete user
+  @Delete('DeleteUser/:id')
+  async delete(@Param('id') id: string): Promise<boolean> {
+    return this.usersService.delete(id);
   }
 }

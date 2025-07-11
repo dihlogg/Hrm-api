@@ -11,4 +11,10 @@ export class CreateUserDto{
 
     @ApiProperty()
     password: string;
+
+    @ApiProperty()
+    jobTitleId: string;
+
+    @ApiProperty()
+    userStatusId: string;
 }
