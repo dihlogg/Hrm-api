@@ -21,9 +21,61 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## HRM API ToDo List
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+#### Users Management
+- [ ] Register User
+- [ ] Login User
+- [ ] Assign Employee to User
+- [ ] Get User by ID
+- [ ] Update User Info
+- [ ] Change Password
+- [ ] List Users with Roles & Status
+---
+#### Employees Management
+- [ ] Manage Employees (CRUD)
+- [ ] Filter/Search Employees by sub_unit, job_title, employment_type
+---
+#### Roles Management
+- [ ] Manage Roles (CRUD)
+---
+#### User Role Assignment
+- [ ] Assign Role to User
+- [ ] Revoke Role from User
+- [ ] Update User Roles (replace all roles)
+- [ ] Get Roles of a User
+- [ ] Get All Users By Role
+---
+#### Sub Units Management
+- [X] Manage Sub Units (CRUD)
+- [ ] Count Employees by SubUnit
+---
+#### Job Titles Management
+- [X] Manage Job Titles (CRUD)
+- [ ] Count Employees by JobTitle
+---
+#### User Status Management
+- [X] Manage User Status (CRUD)
+- [ ] Count User by Status
+- [ ] Assign Status to User
+---
+#### Authentication & Authorization
+- [ ] JWT-based Authentication
+- [ ] Protect Routes by Role
+- [ ] Admin-only Routes
+---
+#### Testing & Validation
+- [ ] Unit Test User Module
+- [ ] Unit Test Employee Module
+- [ ] E2E Test for Auth & Permissions
+- [X] Swagger API Documentation
+---
+#### Database & Migration
+- [X] Setup TypeORM with PostgreSQL
+- [ ] Generate All Migrations
+- [X] Update timestamp to `timestamptz`
+- [ ] Seed Initial Data (Roles, Statuses)
+
 
 ## Project setup
 
