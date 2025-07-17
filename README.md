@@ -40,8 +40,8 @@
 - [ ] Manage Roles (CRUD)
 ---
 #### User Role Assignment
-- [ ] Assign Role to User
-- [ ] Revoke Role from User
+- [X] Assign Role to User
+- [X] Revoke Role from User
 - [ ] Update User Roles (replace all roles)
 - [ ] Get Roles of a User
 - [ ] Get All Users By Role
