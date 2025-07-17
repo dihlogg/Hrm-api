@@ -1,16 +1,20 @@
 import { BaseEntities } from 'src/common/entities/base.entity';
+import { Employee } from 'src/modules/employees/entities/employee.entity';
 import { JobTitle } from 'src/modules/job-title/entities/job-title.entity';
+import { SubUnit } from 'src/modules/sub-unit/entities/sub-unit.entity';
+import { UserRole } from 'src/modules/user-role/entities/user-role.entity';
 import { UserStatus } from 'src/modules/user-status/entities/user-status.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 
 @Entity('Users')
 export class User extends BaseEntities {
-  @Column()
-  firstName: string;
-
-  @Column()
-  lastName: string;
-
   @Column()
   userName: string;
 
@@ -18,16 +22,19 @@ export class User extends BaseEntities {
   password: string;
 
   @Column({ nullable: true })
-  jobTitleId: string;
-
-  @ManyToOne(() => JobTitle, (jobTitle) => jobTitle.users)
-  @JoinColumn({ name: 'jobTitleId' })
-  jobTitle: JobTitle;
-
-  @Column({ nullable: true })
   userStatusId: string;
 
   @ManyToOne(() => UserStatus, (userStatus) => userStatus.users)
   @JoinColumn({ name: 'userStatusId' })
   userStatus: UserStatus;
+
+  @OneToMany(() => UserRole, (userRole) => userRole.user)
+  userRole: UserRole[];
+
+  @Column({ nullable: true })
+  employeeId: string;
+
+  @OneToOne(() => Employee)
+  @JoinColumn({ name: 'employeeId' })
+  employee: Employee;
 }

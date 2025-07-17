@@ -6,6 +6,10 @@ import { UsersModule } from './modules/users/users.module';
 import { JobTitleModule } from './modules/job-title/job-title.module';
 import { UserStatusModule } from './modules/user-status/user-status.module';
 import { ConfigModule } from '@nestjs/config';
+import { SubUnitModule } from './modules/sub-unit/sub-unit.module';
+import { EmployeesModule } from './modules/employees/employees.module';
+import { RolesModule } from './modules/roles/roles.module';
+import { UserRoleModule } from './modules/user-role/user-role.module';
 
 @Module({
   imports: [
@@ -23,6 +27,10 @@ import { ConfigModule } from '@nestjs/config';
     UsersModule,
     JobTitleModule,
     UserStatusModule,
+    SubUnitModule,
+    EmployeesModule,
+    RolesModule,
+    UserRoleModule
   ],
   controllers: [AppController],
   providers: [AppService],
