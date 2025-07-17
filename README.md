@@ -37,7 +37,7 @@
 - [ ] Filter/Search Employees by sub_unit, job_title, employment_type
 ---
 #### Roles Management
-- [ ] Manage Roles (CRUD)
+- [X] Manage Roles (CRUD)
 ---
 #### User Role Assignment
 - [X] Assign Role to User
