@@ -10,9 +10,11 @@ import { SubUnitModule } from './modules/sub-unit/sub-unit.module';
 import { EmployeesModule } from './modules/employees/employees.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { UserRoleModule } from './modules/user-role/user-role.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     ConfigModule.forRoot({ isGlobal: true }), // Load .env
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -30,7 +32,7 @@ import { UserRoleModule } from './modules/user-role/user-role.module';
     SubUnitModule,
     EmployeesModule,
     RolesModule,
-    UserRoleModule
+    UserRoleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
