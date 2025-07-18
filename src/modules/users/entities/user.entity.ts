@@ -28,7 +28,7 @@ export class User extends BaseEntities {
   @JoinColumn({ name: 'userStatusId' })
   userStatus: UserStatus;
 
-  @OneToMany(() => UserRole, (userRole) => userRole.user)
+  @OneToMany(() => UserRole, (userRole) => userRole.user, { eager: true }) //return user role
   userRole: UserRole[];
 
   @Column({ nullable: true })

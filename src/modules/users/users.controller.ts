@@ -30,6 +30,12 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  //get user by user name
+  @Get('GetUserByName/:userName') 
+  async findUserByName(@Param('userName') userName: string): Promise<User> {
+    return this.usersService.findUserByName(userName)
+  }
+
   //create user
   @Post('PostUser')
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {

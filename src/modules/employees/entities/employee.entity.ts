@@ -23,7 +23,7 @@ export class Employee extends BaseEntities {
   @Column({ nullable: true })
   gender: string;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', nullable: true })
   dayOfBirth: Date;
 
   @Column({ nullable: true })

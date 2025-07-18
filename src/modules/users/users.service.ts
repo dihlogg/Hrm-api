@@ -5,6 +5,8 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserStatus } from '../user-status/entities/user-status.entity';
+import { Employee } from '../employees/entities/employee.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -12,20 +14,27 @@ export class UsersService {
     @InjectRepository(User) private readonly repo: Repository<User>,
     @InjectRepository(UserStatus)
     private userStatusRepo: Repository<UserStatus>,
+    @InjectRepository(Employee) private employeeRepo: Repository<Employee>
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const userStatuses = await this.userStatusRepo.findOneBy({
       id: createUserDto.userStatusId,
     });
+    const employees = await this.employeeRepo.findOneBy({ id: createUserDto.employeeId })
 
-    if (!userStatuses) {
-      throw new Error('Job title not found');
+    if (!userStatuses || !employees) {
+      throw new Error('Create user failed');
     }
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
+
     const user = this.repo.create({
       userName: createUserDto.userName,
-      password: createUserDto.password,
+      password: hashedPassword,
       userStatus: userStatuses,
+      employee: employees
     });
 
     return await this.repo.save(user);
@@ -41,6 +50,14 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
     return user;
+  }
+
+  async findUserByName(userName: string): Promise<User> {
+    const user = await this.repo.findOne({ where : {userName}, relations: ['userRole', 'userRole.role']})
+    if(!user) {
+      throw new NotFoundException('User not found')
+    }
+    return user
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<boolean> {

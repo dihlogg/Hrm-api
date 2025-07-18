@@ -6,16 +6,18 @@ import { User } from './entities/user.entity';
 import { JobTitleModule } from '../job-title/job-title.module';
 import { UserStatusModule } from '../user-status/user-status.module';
 import { SubUnitModule } from '../sub-unit/sub-unit.module';
+import { EmployeesModule } from '../employees/employees.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     JobTitleModule,
     UserStatusModule,
-    SubUnitModule
+    SubUnitModule,
+    EmployeesModule
   ],
   controllers: [UsersController],
   providers: [UsersService],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, UsersService],
 })
 export class UsersModule {}
