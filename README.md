@@ -24,16 +24,16 @@
 ## HRM API ToDo List
 
 #### Users Management
-- [ ] Register User
-- [ ] Login User
-- [ ] Assign Employee to User
+- [X] Register User
+- [X] Login User
+- [X] Assign Employee to User
 - [ ] Get User by ID
 - [ ] Update User Info
 - [ ] Change Password
 - [ ] List Users with Roles & Status
 ---
 #### Employees Management
-- [ ] Manage Employees (CRUD)
+- [X] Manage Employees (CRUD)
 - [ ] Filter/Search Employees by sub_unit, job_title, employment_type
 ---
 #### Roles Management
@@ -60,7 +60,7 @@
 - [ ] Assign Status to User
 ---
 #### Authentication & Authorization
-- [ ] JWT-based Authentication
+- [X] JWT-based Authentication
 - [ ] Protect Routes by Role
 - [ ] Admin-only Routes
 ---
