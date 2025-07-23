@@ -14,17 +14,18 @@ export class UsersService {
     @InjectRepository(User) private readonly repo: Repository<User>,
     @InjectRepository(UserStatus)
     private userStatusRepo: Repository<UserStatus>,
-    @InjectRepository(Employee) private employeeRepo: Repository<Employee>
+    @InjectRepository(Employee) private employeeRepo: Repository<Employee>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
+    if (!createUserDto.userStatusId) {
+      throw new Error('Create user failed: userStatusId is required');
+    }
     const userStatuses = await this.userStatusRepo.findOneBy({
       id: createUserDto.userStatusId,
     });
-    const employees = await this.employeeRepo.findOneBy({ id: createUserDto.employeeId })
-
-    if (!userStatuses || !employees) {
-      throw new Error('Create user failed');
+    if (!userStatuses) {
+      throw new Error('Create user failed: UserStatus not found');
     }
 
     const salt = await bcrypt.genSalt();
@@ -34,7 +35,6 @@ export class UsersService {
       userName: createUserDto.userName,
       password: hashedPassword,
       userStatus: userStatuses,
-      employee: employees
     });
 
     return await this.repo.save(user);
@@ -53,11 +53,14 @@ export class UsersService {
   }
 
   async findUserByName(userName: string): Promise<User> {
-    const user = await this.repo.findOne({ where : {userName}, relations: ['userRole', 'userRole.role']})
-    if(!user) {
-      throw new NotFoundException('User not found')
+    const user = await this.repo.findOne({
+      where: { userName },
+      relations: ['userRole', 'userRole.role'],
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
-    return user
+    return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<boolean> {

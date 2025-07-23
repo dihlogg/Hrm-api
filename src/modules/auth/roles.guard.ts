@@ -1,11 +1,11 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
+  Injectable,
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from './roles.decorator';
+import { ROLES_KEY } from 'src/common/decorators/roles.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -16,14 +16,13 @@ export class RolesGuard implements CanActivate {
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
-    if (!requiredRoles || requiredRoles.length === 0) {
-      return true; // Không yêu cầu role cụ thể
-    }
+
+    if (!requiredRoles) return true;
 
     const { user } = context.switchToHttp().getRequest();
 
-    if (!user || !user.roles) {
-      throw new ForbiddenException('No roles found in user');
+    if (!user?.roles) {
+      throw new ForbiddenException('No roles found');
     }
 
     const hasRole = user.roles.some((role: string) =>
@@ -34,6 +33,6 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('Forbidden resource');
     }
 
-    return hasRole;
+    return true;
   }
 }

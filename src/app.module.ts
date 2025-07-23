@@ -10,7 +10,11 @@ import { SubUnitModule } from './modules/sub-unit/sub-unit.module';
 import { EmployeesModule } from './modules/employees/employees.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { UserRoleModule } from './modules/user-role/user-role.module';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { PermissionsModule } from './modules/permissions/permissions.module';
+import { RolePermissionModule } from './modules/permissions/role-permission/role-permission.module';
+import { UserPermissionModule } from './modules/permissions/user-permission/user-permission.module';
+
 
 @Module({
   imports: [
@@ -33,6 +37,9 @@ import { AuthModule } from './auth/auth.module';
     EmployeesModule,
     RolesModule,
     UserRoleModule,
+    PermissionsModule,
+    RolePermissionModule,
+    UserPermissionModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,7 +1,8 @@
 import { BaseEntities } from 'src/common/entities/base.entity';
 import { JobTitle } from 'src/modules/job-title/entities/job-title.entity';
 import { SubUnit } from 'src/modules/sub-unit/entities/sub-unit.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { User } from 'src/modules/users/entities/user.entity';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
 @Entity('Employees')
 export class Employee extends BaseEntities {
@@ -48,4 +49,11 @@ export class Employee extends BaseEntities {
   @ManyToOne(() => SubUnit, (subUnit) => subUnit.employees)
   @JoinColumn({ name: 'subUnitId' })
   subUnit: SubUnit;
+
+  @Column({ nullable: true })
+  userId: string;
+
+  @OneToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 }

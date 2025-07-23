@@ -1,4 +1,5 @@
 import { BaseEntities } from 'src/common/entities/base.entity';
+import { RolePermission } from 'src/modules/permissions/role-permission/entities/role-permission.entity';
 import { UserRole } from 'src/modules/user-role/entities/user-role.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
@@ -15,4 +16,7 @@ export class Role extends BaseEntities {
 
   @OneToMany(() => UserRole, (userRole) => userRole.role)
   userRole: UserRole[];
+
+  @OneToMany(() => RolePermission, (rolePermission) => rolePermission.role)
+  rolePermission: RolePermission
 }
