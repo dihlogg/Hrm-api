@@ -21,6 +21,12 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
+## HRM DB Design
+
+<p align="center">
+  <img src="images/HrmDbDesign.png" alt="DB Design Image" width="300"/>
+</p>
+
 ## HRM API ToDo List
 
 #### Users Management
@@ -33,7 +39,7 @@
 - [ ] List Users with Roles & Status
 ---
 #### Employees Management
-- [ ] Manage Employees (CRUD)
+- [X] Manage Employees (CRUD)
 - [ ] Filter/Search Employees by sub_unit, job_title, employment_type
 ---
 #### Roles Management

@@ -36,4 +36,7 @@ export class CreateEmployeeDto {
 
   @ApiProperty()
   subUnitId: string;
+
+  @ApiProperty()
+  userId: string;
 }

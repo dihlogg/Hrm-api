@@ -7,8 +7,5 @@ export class CreateUserDto {
   password: string;
 
   @ApiProperty()
-  employeeId: string;
-
-  @ApiProperty()
   userStatusId: string;
 }
