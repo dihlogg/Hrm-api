@@ -53,4 +53,14 @@ export class PermissionsController {
   async delete(@Param('id') id: string): Promise<boolean> {
     return this.permissionsService.delete(id);
   }
+
+  @Get(':id/roles')
+  async getRolesByPermissionId(@Param('id') id: string) {
+    return this.permissionsService.getRolesByPermissionId(id);
+  }
+
+  @Get(':id/users')
+  async getUsersOfPermission(@Param('id') id: string) {
+    return await this.permissionsService.getUsersByPermissionId(id);
+  }
 }

@@ -15,20 +15,22 @@ import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UserRole } from './entities/user-role.entity';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@ApiTags('UserRole')
-@Controller('UserRole')
+@ApiTags('User-role')
+@Controller('User-role')
 export class UserRoleController {
   constructor(private readonly userRoleService: UserRoleService) {}
 
   //asign role to user
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('Admin', 'Super Admin')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user-role:assign')
   @Post('AssignRoleToUser')
   async assignRoleToUser(
     @Body() createUserRoleDto: CreateUserRoleDto,
@@ -37,8 +39,8 @@ export class UserRoleController {
   }
 
   //revoke role fr user
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('Super Admin')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user-role:revoke')
   @Put('RevokeRoleFromUser/:id')
   async revokeRoleFromUser(
     @Param('id') id: string,

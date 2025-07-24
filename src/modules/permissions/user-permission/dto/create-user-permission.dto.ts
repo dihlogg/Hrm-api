@@ -1,1 +1,12 @@
-export class CreateUserPermissionDto {}
+import { ApiProperty } from '@nestjs/swagger';
+
+export class CreateUserPermissionDto {
+  @ApiProperty()
+  userId: string;
+
+  @ApiProperty()
+  permissionId: string;
+
+  @ApiProperty()
+  isGranted: boolean;
+}

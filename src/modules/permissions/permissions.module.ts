@@ -11,12 +11,8 @@ import { User } from '../users/entities/user.entity';
 import { UsersModule } from '../users/users.module';
 
 @Module({
- imports: [
-    TypeOrmModule.forFeature([
-      Permission,
-      UserRole,
-      User
-    ]),
+  imports: [
+    TypeOrmModule.forFeature([Permission, UserRole, User]),
     UserPermissionModule,
     RolePermissionModule,
     forwardRef(() => UserRoleModule),

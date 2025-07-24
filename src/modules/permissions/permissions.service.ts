@@ -15,11 +15,11 @@ export class PermissionsService {
     @InjectRepository(Permission)
     private readonly permissionRepo: Repository<Permission>,
     @InjectRepository(UserPermission)
-    private readonly userPermRepo: Repository<UserPermission>,
+    private readonly userPermissionRepo: Repository<UserPermission>,
     @InjectRepository(UserRole)
     private readonly userRoleRepo: Repository<UserRole>,
     @InjectRepository(RolePermission)
-    private readonly rolePermRepo: Repository<RolePermission>,
+    private readonly rolePermissionRepo: Repository<RolePermission>,
   ) {}
 
   // CRUD Permission
@@ -60,10 +60,53 @@ export class PermissionsService {
     return true;
   }
 
+  //Lấy danh sách role có quyền
+  async getRolesByPermissionId(
+    id: string,
+  ): Promise<
+    { id: string; name: string; description: string; display_order: number }[]
+  > {
+    const rolePermissions = await this.rolePermissionRepo.find({
+      where: { permissionId: id },
+      relations: ['role'],
+    });
+
+    return rolePermissions.map((rp) => ({
+      id: rp.role.id,
+      name: rp.role.name,
+      description: rp.role.description,
+      display_order: rp.role.displayOrder,
+    }));
+  }
+
+  // Lấy danh sách user được cấp quyền trực tiếp
+  async getUsersByPermissionId(
+    permissionId: string,
+  ): Promise<
+    {
+      id: string;
+      user_name: string;
+      user_status_id: string;
+      is_granted: boolean;
+    }[]
+  > {
+    const userPerms = await this.userPermissionRepo.find({
+      where: { permissionId },
+      relations: ['user'],
+    });
+
+    return userPerms.map((up) => ({
+      id: up.user.id,
+      user_name: up.user.userName,
+      user_status_id: up.user.userStatusId,
+      is_granted: up.isGranted,
+    }));
+  }
+
   // Dynamic Authorization
   async getPermissionsByUserId(userId: string): Promise<string[]> {
     // 1. User permissions
-    const userPermissions = await this.userPermRepo.find({
+    const userPermissions = await this.userPermissionRepo.find({
       where: { userId: userId },
       relations: ['permission'],
     });
@@ -83,7 +126,7 @@ export class PermissionsService {
     if (roleIds.length === 0) {
       return granted;
     }
-    const rolePermissions = await this.rolePermRepo.find({
+    const rolePermissions = await this.rolePermissionRepo.find({
       where: { roleId: In(roleIds) },
       relations: ['permission'],
     });
