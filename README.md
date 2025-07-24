@@ -38,6 +38,20 @@
 - [ ] Change Password
 - [ ] List Users with Roles & Status
 ---
+#### Permissions
+- [X] Manage Permisions
+---
+#### Role Permission
+- [X] Get All Role Permisions
+- [X] Assign Permission To Role
+- [X] Delete Permission From Role
+---
+#### User Permissions
+- [X] Get All User Permissions
+- [X] Assign Permission To User
+- [X] Delete Permission From User
+- [X] Change Status Is_Granted true/false
+---
 #### Employees Management
 - [X] Manage Employees (CRUD)
 - [ ] Filter/Search Employees by sub_unit, job_title, employment_type
@@ -67,6 +81,7 @@
 ---
 #### Authentication & Authorization
 - [X] JWT-based Authentication
+- [X] Dynamic Permission-based Authorization
 - [ ] Protect Routes by Role
 - [ ] Admin-only Routes
 ---
