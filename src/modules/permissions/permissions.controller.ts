@@ -54,12 +54,20 @@ export class PermissionsController {
     return this.permissionsService.delete(id);
   }
 
-  @Get(':id/roles')
+  //Lấy danh sách role được gán quyền theo permissionId
+  @Get('GetRolesByPermissionId/:id')
   async getRolesByPermissionId(@Param('id') id: string) {
     return this.permissionsService.getRolesByPermissionId(id);
   }
 
-  @Get(':id/users')
+  //Lấy danh sách permissions được gán cho role theo roleId
+  @Get('GetPermissionsByRoleId/:id')
+  async GetPermissionsByRoleId(@Param('id') id: string) {
+    return this.permissionsService.getPermissionsByRoleId(id);
+  }
+
+  //Lấy danh sách user được cấp quyền theo permissionId
+  @Get('GetUsersByPermissionId/:id')
   async getUsersOfPermission(@Param('id') id: string) {
     return await this.permissionsService.getUsersByPermissionId(id);
   }

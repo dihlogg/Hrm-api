@@ -10,3 +10,8 @@ export class CreateUserPermissionDto {
   @ApiProperty()
   isGranted: boolean;
 }
+
+export class UserPermissionDto extends CreateUserPermissionDto {
+  @ApiProperty()
+  id: string;
+}
