@@ -10,3 +10,7 @@ export class CreateRoleDto {
   @ApiProperty()
   displayOrder: number;
 }
+export class RoleDto extends CreateRoleDto {
+  @ApiProperty()
+  id: string;
+}
