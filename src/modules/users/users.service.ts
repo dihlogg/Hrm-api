@@ -4,8 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserStatus } from '../user-status/entities/user-status.entity';
-import { Employee } from '../employees/entities/employee.entity';
+import { UserStatus } from './user-status/entities/user-status.entity';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -14,7 +13,6 @@ export class UsersService {
     @InjectRepository(User) private readonly repo: Repository<User>,
     @InjectRepository(UserStatus)
     private userStatusRepo: Repository<UserStatus>,
-    @InjectRepository(Employee) private employeeRepo: Repository<Employee>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {

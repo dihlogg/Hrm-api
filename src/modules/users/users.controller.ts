@@ -6,43 +6,59 @@ import {
   Body,
   Param,
   Put,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @ApiTags('Users')
 @Controller('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   //get all users
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user:read')
   @Get('GetAllUsers')
   async findAll(): Promise<User[]> {
     return await this.usersService.findAll();
   }
 
   //get user by id
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user:read')
   @Get('GetUserById/:id')
   async findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(id);
   }
 
   //get user by user name
-  @Get('GetUserByName/:userName') 
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user:read')
+  @Get('GetUserByName/:userName')
   async findUserByName(@Param('userName') userName: string): Promise<User> {
-    return this.usersService.findUserByName(userName)
+    return this.usersService.findUserByName(userName);
   }
 
   //create user
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user:create')
   @Post('PostUser')
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return await this.usersService.create(createUserDto);
   }
 
   //update user
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user:update')
   @Put('PostUser/:id')
   async update(
     @Param('id') id: string,
@@ -52,6 +68,8 @@ export class UsersController {
   }
 
   //delete user
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user:delete')
   @Delete('DeleteUser/:id')
   async delete(@Param('id') id: string): Promise<boolean> {
     return this.usersService.delete(id);

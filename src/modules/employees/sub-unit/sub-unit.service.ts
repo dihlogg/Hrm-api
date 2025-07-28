@@ -1,10 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateSubUnitDto } from './dto/create-sub-unit.dto';
 import { SubUnit } from './entities/sub-unit.entity';
+import { CreateSubUnitDto } from './dto/create-sub-unit.dto';
 import { UpdateSubUnitDto } from './dto/update-sub-unit.dto';
-
 @Injectable()
 export class SubUnitService {
   constructor(

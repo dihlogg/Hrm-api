@@ -8,7 +8,7 @@ import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { UserPermission } from './user-permission/entities/user-permission.entity';
 import { RolePermission } from './role-permission/entities/role-permission.entity';
 import { UserPermissionDto } from './user-permission/dto/create-user-permission.dto';
-import { CreateRoleDto, RoleDto } from '../roles/dto/create-role.dto';
+import { RoleDto } from '../roles/dto/create-role.dto';
 
 @Injectable()
 export class PermissionsService {

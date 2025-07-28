@@ -7,31 +7,43 @@ import {
   Param,
   Delete,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserStatusService } from './user-status.service';
+import { UserStatus } from './entities/user-status.entity';
 import { CreateUserStatusDto } from './dto/create-user-status.dto';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
-import { ApiTags } from '@nestjs/swagger';
-import { UserStatus } from './entities/user-status.entity';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @ApiTags('UserStatus')
 @Controller('UserStatuses')
 export class UserStatusController {
   constructor(private readonly userStatusService: UserStatusService) {}
 
   //get all user statuses
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user-status:read')
   @Get('GetAllUserStatuses')
   async findAll(): Promise<UserStatus[]> {
     return await this.userStatusService.findAll();
   }
 
   //get user status by id
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user-status:read')
   @Get('GetUserStatusById/:id')
   async findOne(@Param('id') id: string): Promise<UserStatus> {
     return this.userStatusService.findOne(id);
   }
 
   //create user status
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user-status:create')
   @Post('PostUserStatus')
   async create(
     @Body() createUserStatusDto: CreateUserStatusDto,
@@ -40,6 +52,8 @@ export class UserStatusController {
   }
 
   //update user status
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user-status:update')
   @Put('PutUserStatus/:id')
   async update(
     @Param('id') id: string,
@@ -49,6 +63,8 @@ export class UserStatusController {
   }
 
   //delete user status
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user-status:delete')
   @Delete('DeleteUserStatus/:id')
   async delete(@Param('id') id: string): Promise<boolean> {
     return this.userStatusService.delete(id);
