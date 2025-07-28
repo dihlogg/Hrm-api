@@ -1,7 +1,7 @@
 import { BaseEntities } from 'src/common/entities/base.entity';
 import { UserPermission } from 'src/modules/permissions/user-permission/entities/user-permission.entity';
 import { UserRole } from 'src/modules/user-role/entities/user-role.entity';
-import { UserStatus } from 'src/modules/user-status/entities/user-status.entity';
+import { UserStatus } from 'src/modules/users/user-status/entities/user-status.entity';
 import {
   Column,
   Entity,

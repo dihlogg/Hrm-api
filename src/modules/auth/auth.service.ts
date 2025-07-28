@@ -1,9 +1,9 @@
-// src/modules/auth/auth.service.ts
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { PermissionsService } from '../permissions/permissions.service';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {

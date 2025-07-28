@@ -5,13 +5,14 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PermissionsModule } from '../permissions/permissions.module';
-import { UsersModule } from '../users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { User } from '../users/entities/user.entity';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
-    UsersModule,
-    PermissionsModule,
+    forwardRef(() => UsersModule),
+    forwardRef(() => PermissionsModule),
     ConfigModule,
     PassportModule,
     JwtModule.registerAsync({

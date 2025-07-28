@@ -1,6 +1,6 @@
 import { BaseEntities } from 'src/common/entities/base.entity';
-import { JobTitle } from 'src/modules/job-title/entities/job-title.entity';
-import { SubUnit } from 'src/modules/sub-unit/entities/sub-unit.entity';
+import { JobTitle } from 'src/modules/employees/job-title/entities/job-title.entity';
+import { SubUnit } from 'src/modules/employees/sub-unit/entities/sub-unit.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
