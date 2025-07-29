@@ -6,8 +6,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { User } from '../users/entities/user.entity';
 import { UsersModule } from '../users/users.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
@@ -15,6 +15,7 @@ import { UsersModule } from '../users/users.module';
     forwardRef(() => PermissionsModule),
     ConfigModule,
     PassportModule,
+    RedisModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
