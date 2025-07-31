@@ -14,6 +14,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { RolePermissionModule } from './modules/permissions/role-permission/role-permission.module';
 import { UserPermissionModule } from './modules/permissions/user-permission/user-permission.module';
+import { RedisModule } from './redis/redis.module';
 
 
 @Module({
@@ -39,7 +40,8 @@ import { UserPermissionModule } from './modules/permissions/user-permission/user
     UserRoleModule,
     PermissionsModule,
     RolePermissionModule,
-    UserPermissionModule
+    UserPermissionModule,
+    RedisModule
   ],
   controllers: [AppController],
   providers: [AppService],

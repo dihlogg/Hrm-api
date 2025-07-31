@@ -1,6 +1,7 @@
 import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('Auth')
 export class AuthController {
@@ -15,8 +16,9 @@ export class AuthController {
     }
     return this.authService.login(user);
   }
+  
   @Post('RefreshToken')
-  async refresh(@Body() body: { refresh_token: string }) {
-    return this.authService.refreshToken(body.refresh_token);
+  async refresh(@Body() body: RefreshTokenDto) {
+    return this.authService.refreshToken(body.refreshToken);
   }
 }

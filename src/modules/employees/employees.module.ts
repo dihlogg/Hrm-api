@@ -7,9 +7,10 @@ import { JobTitleModule } from './job-title/job-title.module';
 import { SubUnitModule } from './sub-unit/sub-unit.module';
 import { AuthModule } from '../auth/auth.module';
 import { PermissionsModule } from '../permissions/permissions.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Employee]), JobTitleModule, SubUnitModule, AuthModule, PermissionsModule],
+  imports: [TypeOrmModule.forFeature([Employee]), JobTitleModule, SubUnitModule, AuthModule, PermissionsModule, UsersModule],
   controllers: [EmployeesController],
   providers: [EmployeesService],
   exports: [TypeOrmModule, EmployeesService],

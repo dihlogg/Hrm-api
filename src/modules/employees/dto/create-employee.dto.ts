@@ -1,4 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 
 export class CreateEmployeeDto {
   @ApiProperty()
@@ -37,6 +38,9 @@ export class CreateEmployeeDto {
   @ApiProperty()
   subUnitId: string;
 
-  @ApiProperty()
-  userId: string;
+  @ApiPropertyOptional({ default: false })
+  createLogin?: boolean;
+
+  @ApiPropertyOptional({ type: () => CreateUserDto })
+  user?: CreateUserDto;
 }

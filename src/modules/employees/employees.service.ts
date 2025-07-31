@@ -1,19 +1,42 @@
-import { Delete, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from './entities/employee.entity';
 import { Repository } from 'typeorm';
+import { UsersService } from '../users/users.service';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class EmployeesService {
   constructor(
     @InjectRepository(Employee) private readonly repo: Repository<Employee>,
+    private readonly usersService: UsersService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
-    const employee = this.repo.create(createEmployeeDto);
-    return await this.repo.save(createEmployeeDto);
+    return await this.dataSource.transaction(async (manager) => {
+      const { createLogin = false, user, ...employeeData } = createEmployeeDto;
+
+      let userId: string | undefined;
+
+      if (createLogin) {
+        if (!user) {
+          throw new Error('Missing user info while createLogin is true.');
+        }
+
+        const newUser = await this.usersService.create(user, manager);
+        userId = newUser.id;
+      }
+      const employeeToCreate = {
+        ...employeeData,
+        ...(userId && { userId }),
+      };
+
+      const employee = manager.getRepository(Employee).create(employeeToCreate);
+      return await manager.getRepository(Employee).save(employee);
+    });
   }
 
   async findAll(): Promise<Employee[]> {
