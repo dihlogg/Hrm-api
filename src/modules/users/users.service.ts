@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,27 +15,44 @@ export class UsersService {
     private userStatusRepo: Repository<UserStatus>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(
+    createUserDto: CreateUserDto,
+    manager?: EntityManager,
+  ): Promise<User> {
+    const repo = manager ? manager.getRepository(User) : this.repo;
+    const userStatusRepo = manager
+      ? manager.getRepository(UserStatus)
+      : this.userStatusRepo;
+
     if (!createUserDto.userStatusId) {
       throw new Error('Create user failed: userStatusId is required');
     }
-    const userStatuses = await this.userStatusRepo.findOneBy({
+
+    const existingUser = await repo.findOne({
+      where: { userName: createUserDto.userName },
+    });
+    if (existingUser) {
+      throw new Error(`Username '${createUserDto.userName}' is already taken.`);
+    }
+
+    const userStatus = await userStatusRepo.findOneBy({
       id: createUserDto.userStatusId,
     });
-    if (!userStatuses) {
+
+    if (!userStatus) {
       throw new Error('Create user failed: UserStatus not found');
     }
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
-    const user = this.repo.create({
+    const user = repo.create({
       userName: createUserDto.userName,
       password: hashedPassword,
-      userStatus: userStatuses,
+      userStatus: userStatus,
     });
 
-    return await this.repo.save(user);
+    return await repo.save(user);
   }
 
   async findAll(): Promise<User[]> {
