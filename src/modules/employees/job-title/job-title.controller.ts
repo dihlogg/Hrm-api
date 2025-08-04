@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { JobTitleService } from './job-title.service';
 import { CreateJobTitleDto } from './dto/create-job-title.dto';
@@ -67,5 +68,13 @@ export class JobTitleController {
   @Delete('DeleteJobTitle/:id')
   async delete(@Param('id') id: string): Promise<boolean> {
     return this.jobTitleService.delete(id);
+  }
+
+  //sort job titles by name
+  @Get('SortJobTitlesByName')
+  async sortByName(
+    @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'ASC'
+  ): Promise<JobTitle[]> {
+    return this.jobTitleService.sortByName(sortOrder);
   }
 }

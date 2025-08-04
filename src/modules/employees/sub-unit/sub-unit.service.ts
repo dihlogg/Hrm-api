@@ -17,7 +17,11 @@ export class SubUnitService {
   }
 
   async findAll(): Promise<SubUnit[]> {
-    return await this.repo.find();
+    return await this.repo.find({
+      order: {
+        displayOrder: 'ASC'
+      }
+    });
   }
 
   async findOne(id: string): Promise<SubUnit> {
@@ -46,5 +50,13 @@ export class SubUnitService {
       throw new NotFoundException('Sub Unit not found');
     }
     return true;
+  }
+
+  async sortByName(order: 'ASC' | 'DESC' = 'ASC'): Promise<SubUnit[]> {
+    return this.repo.find({
+      order: {
+        name: order
+      }
+    })
   }
 }

@@ -8,6 +8,7 @@ import {
   Delete,
   Put,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserStatusService } from './user-status.service';
@@ -68,5 +69,12 @@ export class UserStatusController {
   @Delete('DeleteUserStatus/:id')
   async delete(@Param('id') id: string): Promise<boolean> {
     return this.userStatusService.delete(id);
+  }
+
+  @Get('SortUserStatusesByName')
+  async sortByName(
+    @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'ASC',
+  ): Promise<UserStatus[]> {
+    return this.userStatusService.sortByName(sortOrder);
   }
 }
