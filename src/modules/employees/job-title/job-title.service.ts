@@ -18,7 +18,11 @@ export class JobTitleService {
   }
 
   async findAll(): Promise<JobTitle[]> {
-    return await this.repo.find();
+    return await this.repo.find({
+      order: {
+        displayOrder: 'ASC',
+      },
+    });
   }
 
   async findOne(id: string): Promise<JobTitle> {
@@ -47,5 +51,13 @@ export class JobTitleService {
       throw new NotFoundException('Job title not found');
     }
     return true;
+  }
+
+  async sortByName(order: 'ASC' | 'DESC' = 'ASC'): Promise<JobTitle[]> {
+    return this.repo.find({
+      order: {
+        name: order,
+      },
+    });
   }
 }

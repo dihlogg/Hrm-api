@@ -8,6 +8,7 @@ import {
   Delete,
   Put,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SubUnitService } from './sub-unit.service';
@@ -66,5 +67,13 @@ export class SubUnitController {
   @Delete('DeleteSubUnit/:id')
   async delete(@Param('id') id: string): Promise<boolean> {
     return this.subUnitService.delete(id);
+  }
+
+  //sort sub units by name
+  @Get('SortSubUnitsByName')
+  async sortByName(
+    @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'ASC',
+  ): Promise<SubUnit[]> {
+    return this.subUnitService.sortByName(sortOrder);
   }
 }

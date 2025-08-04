@@ -18,7 +18,11 @@ export class UserStatusService {
   }
 
   async findAll(): Promise<UserStatus[]> {
-    return await this.repo.find();
+    return await this.repo.find({
+      order: {
+        displayOrder: 'ASC',
+      }
+    });
   }
 
   async findOne(id: string): Promise<UserStatus> {
@@ -47,5 +51,13 @@ export class UserStatusService {
       throw new NotFoundException('Status not found');
     }
     return true;
+  }
+
+  async sortByName(order: 'ASC' | 'DESC' = 'ASC'): Promise<UserStatus[]> {
+    return this.repo.find({
+      order: {
+        name: order
+      }
+    })
   }
 }

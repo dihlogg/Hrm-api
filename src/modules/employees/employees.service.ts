@@ -3,9 +3,12 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from './entities/employee.entity';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { DataSource } from 'typeorm';
+import { GetEmployeeListDto } from './dto/get-employee-list.dto';
+import { PaginationDto } from 'src/common/utils/pagination/pagination.dto';
+import { paginateAndFormat } from 'src/common/utils/pagination/pagination.utils';
 
 @Injectable()
 export class EmployeesService {
@@ -39,6 +42,28 @@ export class EmployeesService {
     });
   }
 
+  async getPaginatedEmployees(dto: PaginationDto) {
+    const { page = 1, pageSize = 10 } = dto;
+
+    return paginateAndFormat(this.repo, {
+      page: Number(page),
+      pageSize: Number(pageSize),
+      useQueryBuilder: false,
+      findOptions: {
+        relations: {
+          jobTitle: true,
+          subUnit: true,
+          user: {
+            userStatus: true,
+          },
+        },
+        order: {
+          firstName: 'ASC',
+        },
+      },
+    });
+  }
+
   async findAll(): Promise<Employee[]> {
     return await this.repo.find();
   }
@@ -69,5 +94,70 @@ export class EmployeesService {
       throw new NotFoundException('Employee not found');
     }
     return true;
+  }
+
+  async getEmployeeList(dto: GetEmployeeListDto) {
+    const { page = 1, pageSize = 10 } = dto;
+
+    let query = this.repo
+      .createQueryBuilder('employee')
+      .leftJoinAndSelect('employee.jobTitle', 'jobTitle')
+      .leftJoinAndSelect('employee.subUnit', 'subUnit')
+      .leftJoinAndSelect('employee.user', 'user');
+
+    query = this.applyFilters(query, dto);
+    query = this.applySorting(query, dto);
+
+    return paginateAndFormat(query, {
+      page: Number(page),
+      pageSize: Number(pageSize),
+      useQueryBuilder: true,
+      queryBuilder: query,
+    });
+  }
+
+  private applyFilters(
+    query: SelectQueryBuilder<Employee>,
+    dto: GetEmployeeListDto,
+  ) {
+    const { firstName, lastName, employmentType, jobTitleId, subUnitId } = dto;
+
+    if (firstName)
+      query.andWhere('employee.firstName ILIKE :firstName', {
+        firstName: `%${firstName}%`,
+      });
+    if (lastName)
+      query.andWhere('employee.lastName ILIKE :lastName', {
+        lastName: `%${lastName}%`,
+      });
+    if (employmentType)
+      query.andWhere('employee.employmentType ILIKE :employmentType', {
+        employmentType: `%${employmentType}%`,
+      });
+    if (jobTitleId) query.andWhere('jobTitle.id = :jobTitleId', { jobTitleId });
+    if (subUnitId) query.andWhere('subUnit.id = :subUnitId', { subUnitId });
+
+    return query;
+  }
+
+  private applySorting(
+    query: SelectQueryBuilder<Employee>,
+    dto: GetEmployeeListDto,
+  ) {
+    const sortFieldMap = {
+      firstName: 'employee.firstName',
+      lastName: 'employee.lastName',
+      employmentType: 'employee.employmentType',
+      jobTitle: 'jobTitle.name',
+      subUnit: 'subUnit.name',
+    };
+    if (!dto.sortBy) {
+      return query;
+    }
+
+    const sortField = sortFieldMap[dto.sortBy];
+    const sortOrder = dto.sortOrder;
+
+    return query.orderBy(sortField, sortOrder);
   }
 }
