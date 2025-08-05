@@ -4,10 +4,10 @@ import { PaginationDto } from 'src/common/utils/pagination/pagination.dto';
 
 export class GetEmployeeListDto extends PaginationDto {
   @ApiPropertyOptional({
-    enum: ['firstName', 'lastName', 'employmentType', 'jobTitle', 'subUnit'],
+    enum: ['firstName', 'lastName', 'employeeStatus', 'jobTitle', 'subUnit'],
   })
   @IsOptional()
-  @IsIn(['firstName', 'lastName', 'employmentType', 'jobTitle', 'subUnit'])
+  @IsIn(['firstName', 'lastName', 'employeeStatus', 'jobTitle', 'subUnit'])
   sortBy?: string;
 
   @ApiPropertyOptional({ enum: ['ASC', 'DESC'] })
@@ -17,7 +17,7 @@ export class GetEmployeeListDto extends PaginationDto {
 
   @IsOptional() firstName?: string;
   @IsOptional() lastName?: string;
-  @IsOptional() employmentType?: string;
+  @IsOptional() employeeStatusId?: string;
   @IsOptional() jobTitleId?: string;
   @IsOptional() subUnitId?: string;
 }

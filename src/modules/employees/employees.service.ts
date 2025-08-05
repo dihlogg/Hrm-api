@@ -9,6 +9,7 @@ import { DataSource } from 'typeorm';
 import { GetEmployeeListDto } from './dto/get-employee-list.dto';
 import { PaginationDto } from 'src/common/utils/pagination/pagination.dto';
 import { paginateAndFormat } from 'src/common/utils/pagination/pagination.utils';
+import { EmployeeStatus } from './employee-status/entities/employee-status.entity';
 
 @Injectable()
 export class EmployeesService {
@@ -53,12 +54,10 @@ export class EmployeesService {
         relations: {
           jobTitle: true,
           subUnit: true,
-          user: {
-            userStatus: true,
-          },
+          employeeStatus: true,
         },
         order: {
-          firstName: 'ASC',
+          createDate: 'DESC',
         },
       },
     });
@@ -103,7 +102,7 @@ export class EmployeesService {
       .createQueryBuilder('employee')
       .leftJoinAndSelect('employee.jobTitle', 'jobTitle')
       .leftJoinAndSelect('employee.subUnit', 'subUnit')
-      .leftJoinAndSelect('employee.user', 'user');
+      .leftJoinAndSelect('employee.employeeStatus', 'employeeStatus');
 
     query = this.applyFilters(query, dto);
     query = this.applySorting(query, dto);
@@ -120,7 +119,8 @@ export class EmployeesService {
     query: SelectQueryBuilder<Employee>,
     dto: GetEmployeeListDto,
   ) {
-    const { firstName, lastName, employmentType, jobTitleId, subUnitId } = dto;
+    const { firstName, lastName, employeeStatusId, jobTitleId, subUnitId } =
+      dto;
 
     if (firstName)
       query.andWhere('employee.firstName ILIKE :firstName', {
@@ -130,29 +130,32 @@ export class EmployeesService {
       query.andWhere('employee.lastName ILIKE :lastName', {
         lastName: `%${lastName}%`,
       });
-    if (employmentType)
-      query.andWhere('employee.employmentType ILIKE :employmentType', {
-        employmentType: `%${employmentType}%`,
+    if (employeeStatusId)
+      query.andWhere('employee.employeeStatusId = :employeeStatusId', {
+        employeeStatusId,
       });
-    if (jobTitleId) query.andWhere('jobTitle.id = :jobTitleId', { jobTitleId });
-    if (subUnitId) query.andWhere('subUnit.id = :subUnitId', { subUnitId });
+    if (jobTitleId)
+      query.andWhere('employee.jobTitleId = :jobTitleId', { jobTitleId });
+    if (subUnitId)
+      query.andWhere('employee.subUnitId = :subUnitId', { subUnitId });
 
     return query;
   }
 
-  private applySorting(
+  private applySorting( 
     query: SelectQueryBuilder<Employee>,
     dto: GetEmployeeListDto,
   ) {
     const sortFieldMap = {
       firstName: 'employee.firstName',
       lastName: 'employee.lastName',
-      employmentType: 'employee.employmentType',
+      employeeStatus: 'employeeStatus.name',
       jobTitle: 'jobTitle.name',
       subUnit: 'subUnit.name',
     };
-    if (!dto.sortBy) {
-      return query;
+
+    if (!dto.sortBy || !dto.sortOrder) {
+      return query.orderBy('employee.createDate', 'DESC');
     }
 
     const sortField = sortFieldMap[dto.sortBy];

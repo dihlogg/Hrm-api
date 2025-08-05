@@ -30,7 +30,7 @@ export class CreateEmployeeDto {
   imageUrl: string;
 
   @ApiProperty()
-  employmentType: string; // 'official' | 'temporary'
+  employeeStatusId: string; // 'official' | 'temporary'
 
   @ApiProperty()
   jobTitleId: string;

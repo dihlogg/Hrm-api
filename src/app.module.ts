@@ -15,6 +15,7 @@ import { PermissionsModule } from './modules/permissions/permissions.module';
 import { RolePermissionModule } from './modules/permissions/role-permission/role-permission.module';
 import { UserPermissionModule } from './modules/permissions/user-permission/user-permission.module';
 import { RedisModule } from './redis/redis.module';
+import { EmployeeStatusModule } from './modules/employees/employee-status/employee-status.module';
 
 
 @Module({
@@ -35,6 +36,7 @@ import { RedisModule } from './redis/redis.module';
     JobTitleModule,
     UserStatusModule,
     SubUnitModule,
+    EmployeeStatusModule,
     EmployeesModule,
     RolesModule,
     UserRoleModule,

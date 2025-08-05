@@ -8,9 +8,10 @@ import { SubUnitModule } from './sub-unit/sub-unit.module';
 import { AuthModule } from '../auth/auth.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { UsersModule } from '../users/users.module';
+import { EmployeeStatusModule } from './employee-status/employee-status.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Employee]), JobTitleModule, SubUnitModule, AuthModule, PermissionsModule, UsersModule],
+  imports: [TypeOrmModule.forFeature([Employee]), JobTitleModule, SubUnitModule, AuthModule, PermissionsModule, UsersModule, EmployeeStatusModule],
   controllers: [EmployeesController],
   providers: [EmployeesService],
   exports: [TypeOrmModule, EmployeesService],
