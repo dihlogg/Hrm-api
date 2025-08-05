@@ -3,6 +3,7 @@ import { JobTitle } from 'src/modules/employees/job-title/entities/job-title.ent
 import { SubUnit } from 'src/modules/employees/sub-unit/entities/sub-unit.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { EmployeeStatus } from '../employee-status/entities/employee-status.entity';
 
 @Entity('Employees')
 export class Employee extends BaseEntities {
@@ -34,9 +35,6 @@ export class Employee extends BaseEntities {
   imageUrl: string;
 
   @Column({ nullable: true })
-  employmentType: string; // 'official' | 'temporary'
-
-  @Column({ nullable: true })
   jobTitleId: string;
 
   @ManyToOne(() => JobTitle, (jobTitle) => jobTitle.employees)
@@ -49,6 +47,13 @@ export class Employee extends BaseEntities {
   @ManyToOne(() => SubUnit, (subUnit) => subUnit.employees)
   @JoinColumn({ name: 'subUnitId' })
   subUnit: SubUnit;
+
+  @Column({ nullable: true })
+  employeeStatusId: string;
+
+  @ManyToOne(() => EmployeeStatus, (employeeStatus) => employeeStatus.employees)
+  @JoinColumn({ name: 'employeeStatusId' })
+  employeeStatus: EmployeeStatus;
 
   @Column({ nullable: true })
   userId: string;
