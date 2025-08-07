@@ -6,6 +6,8 @@ import { PermissionsService } from '../permissions/permissions.service';
 import { randomUUID } from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
+import { EmployeesService } from '../employees/employees.service';
+import { use } from 'passport';
 
 @Injectable()
 export class AuthService {
@@ -58,6 +60,9 @@ export class AuthService {
       access_token: accessToken,
       refresh_token: refreshToken,
       expires_in: this.configService.get<string>('JWT_EXPIRES_IN'),
+      user: {
+        employee: user.employee || null,
+      },
     };
   }
 
@@ -76,6 +81,7 @@ export class AuthService {
       const permissions = await this.permissionService.getPermissionsByUserId(
         user.id,
       );
+      const employees = user.employee;
       const newJti = randomUUID();
 
       const newAccessToken = this.jwtService.sign(
@@ -84,6 +90,7 @@ export class AuthService {
           userName: user.userName,
           roles,
           permissions,
+          employees,
           jti: newJti,
         },
         {
@@ -105,6 +112,9 @@ export class AuthService {
         access_token: newAccessToken,
         refresh_token: newRefreshToken,
         expires_in: this.configService.get<string>('JWT_EXPIRES_IN'),
+        user: {
+          employee: user.employee || null,
+        },
       };
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired refresh token');
