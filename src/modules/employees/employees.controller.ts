@@ -8,6 +8,7 @@ import {
   Put,
   UseGuards,
   Query,
+  Patch,
 } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
@@ -62,6 +63,14 @@ export class EmployeesController {
     @Body() updateEmployeeDto: UpdateEmployeeDto,
   ): Promise<boolean> {
     return await this.employeesService.update(id, updateEmployeeDto);
+  }
+
+  //change employee status to on levae
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('employee:update')
+  @Patch('PatchEmployeeStatusOnLeave/:id')
+  async updateEmployeeStatus(@Param('id') id: string): Promise<boolean> {
+    return await this.employeesService.updateEmployeeStatus(id)
   }
 
   //delete empoyee

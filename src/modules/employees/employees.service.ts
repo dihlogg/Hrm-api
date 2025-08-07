@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,7 +13,6 @@ import { DataSource } from 'typeorm';
 import { GetEmployeeListDto } from './dto/get-employee-list.dto';
 import { PaginationDto } from 'src/common/utils/pagination/pagination.dto';
 import { paginateAndFormat } from 'src/common/utils/pagination/pagination.utils';
-import { EmployeeStatus } from './employee-status/entities/employee-status.entity';
 
 @Injectable()
 export class EmployeesService {
@@ -87,6 +90,21 @@ export class EmployeesService {
     return true;
   }
 
+  async updateEmployeeStatus(id: string): Promise<boolean> {
+    const ON_LEAVE_STATUS_ID = 'a0ed70e2-05d0-4620-b27a-a4881fe9f5b3';
+    const employee = await this.repo.findOne({ where: { id } });
+
+    if (!employee) {
+      throw new NotFoundException('Employee not found');
+    }
+    if (employee.employeeStatusId === ON_LEAVE_STATUS_ID) {
+      throw new BadRequestException('This employee is already on leave');
+    }
+
+    await this.repo.update(id, { employeeStatusId: ON_LEAVE_STATUS_ID });
+    return true;
+  }
+
   async delete(id: string): Promise<boolean> {
     const result = await this.repo.delete(id);
     if (result.affected === 0) {
@@ -142,7 +160,7 @@ export class EmployeesService {
     return query;
   }
 
-  private applySorting( 
+  private applySorting(
     query: SelectQueryBuilder<Employee>,
     dto: GetEmployeeListDto,
   ) {
