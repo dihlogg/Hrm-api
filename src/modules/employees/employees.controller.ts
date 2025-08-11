@@ -70,7 +70,7 @@ export class EmployeesController {
   @Permissions('employee:update')
   @Patch('PatchEmployeeStatusOnLeave/:id')
   async updateEmployeeStatus(@Param('id') id: string): Promise<boolean> {
-    return await this.employeesService.updateEmployeeStatus(id)
+    return await this.employeesService.updateEmployeeStatus(id);
   }
 
   //delete empoyee
@@ -82,8 +82,18 @@ export class EmployeesController {
   }
 
   //sorting and pagination employees with filters
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('employee:read')
   @Get('GetEmployeeList')
   async getEmployeeList(@Query() query: GetEmployeeListDto) {
     return this.employeesService.getEmployeeList(query);
+  }
+
+  //get employee details by user id
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('employee:read')
+  @Get('GetEmployeeDetailsByUserId/:id')
+  async getEmployeeByUserId(@Param('id') id: string) {
+    return this.employeesService.getEmployeeDetailsByUserId(id);
   }
 }

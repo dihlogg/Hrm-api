@@ -28,19 +28,19 @@ export class UsersService {
       throw new Error('Create user failed: userStatusId is required');
     }
 
-    const existingUser = await repo.findOne({
-      where: { userName: createUserDto.userName },
-    });
-    if (existingUser) {
-      throw new Error(`Username '${createUserDto.userName}' is already taken.`);
-    }
-
     const userStatus = await userStatusRepo.findOneBy({
       id: createUserDto.userStatusId,
     });
 
     if (!userStatus) {
       throw new Error('Create user failed: UserStatus not found');
+    }
+
+    const existingUser = await repo.findOne({
+      where: { userName: createUserDto.userName },
+    });
+    if (existingUser) {
+      throw new Error(`Username '${createUserDto.userName}' is already taken.`);
     }
 
     const salt = await bcrypt.genSalt();
@@ -60,7 +60,10 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.repo.findOne({ where: { id }, relations: ['employee'] });
+    const user = await this.repo.findOne({
+      where: { id },
+      relations: ['employee'],
+    });
     if (!user) {
       throw new NotFoundException('User not found');
     }
