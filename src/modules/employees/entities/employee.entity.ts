@@ -2,8 +2,17 @@ import { BaseEntities } from 'src/common/entities/base.entity';
 import { JobTitle } from 'src/modules/employees/job-title/entities/job-title.entity';
 import { SubUnit } from 'src/modules/employees/sub-unit/entities/sub-unit.entity';
 import { User } from 'src/modules/users/entities/user.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { EmployeeStatus } from '../employee-status/entities/employee-status.entity';
+import { LeaveRequest } from 'src/modules/leave-requests/entities/leave-request.entity';
+import { LeaveRequestInform } from 'src/modules/leave-requests/leave-request-inform/entities/leave-request-inform.entity';
 
 @Entity('Employees')
 export class Employee extends BaseEntities {
@@ -61,4 +70,13 @@ export class Employee extends BaseEntities {
   @OneToOne(() => User)
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
+  leaveRequests: LeaveRequest[];
+
+  @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.approver)
+  approvedRequests: LeaveRequest[];
+
+  @OneToMany(() => LeaveRequestInform, (inform) => inform.employees)
+  informedRequests: LeaveRequestInform[];
 }

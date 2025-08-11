@@ -16,6 +16,12 @@ import { RolePermissionModule } from './modules/permissions/role-permission/role
 import { UserPermissionModule } from './modules/permissions/user-permission/user-permission.module';
 import { RedisModule } from './redis/redis.module';
 import { EmployeeStatusModule } from './modules/employees/employee-status/employee-status.module';
+import { LeaveRequestsModule } from './modules/leave-requests/leave-requests.module';
+import { LeaveStatusModule } from './modules/leave-requests/leave-status/leave-status.module';
+import { LeaveReasonModule } from './modules/leave-requests/leave-reason/leave-reason.module';
+import { PartialDayModule } from './modules/leave-requests/partial-day/partial-day.module';
+import { LeaveRequestInformModule } from './modules/leave-requests/leave-request-inform/leave-request-inform.module';
+import { LeaveRequestTypeModule } from './modules/leave-requests/leave-request-type/leave-request-type.module';
 
 
 @Module({
@@ -43,7 +49,13 @@ import { EmployeeStatusModule } from './modules/employees/employee-status/employ
     PermissionsModule,
     RolePermissionModule,
     UserPermissionModule,
-    RedisModule
+    RedisModule,
+    LeaveRequestsModule,
+    LeaveStatusModule,
+    LeaveReasonModule,
+    PartialDayModule,
+    LeaveRequestInformModule,
+    LeaveRequestTypeModule
   ],
   controllers: [AppController],
   providers: [AppService],

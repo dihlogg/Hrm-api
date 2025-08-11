@@ -12,7 +12,7 @@ import { UsersService } from '../users/users.service';
 import { DataSource } from 'typeorm';
 import { GetEmployeeListDto } from './dto/get-employee-list.dto';
 import { PaginationDto } from 'src/common/utils/pagination/pagination.dto';
-import { paginateAndFormat } from 'src/common/utils/pagination/pagination.utils';
+import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
 
 @Injectable()
 export class EmployeesService {
@@ -111,6 +111,22 @@ export class EmployeesService {
       throw new NotFoundException('Employee not found');
     }
     return true;
+  }
+
+  async getEmployeeDetailsByUserId(userId: string): Promise<Employee> {
+    const employee = await this.repo.findOne({
+      where: { userId },
+      relations: {
+        jobTitle: true,
+        subUnit: true,
+        employeeStatus: true,
+      },
+    });
+
+    if (!employee) {
+      throw new NotFoundException('Employee not found for this user');
+    }
+    return employee;
   }
 
   async getEmployeeList(dto: GetEmployeeListDto) {
