@@ -6,7 +6,4 @@ export class CreateSubUnitDto {
 
   @ApiProperty()
   description: string;
-
-  @ApiProperty()
-  displayOrder: number;
 }

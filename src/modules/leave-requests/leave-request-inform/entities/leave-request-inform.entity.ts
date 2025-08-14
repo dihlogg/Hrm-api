@@ -3,8 +3,11 @@ import { Employee } from 'src/modules/employees/entities/employee.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { LeaveRequest } from '../../entities/leave-request.entity';
 
-@Entity('LeaveRequestInforms')
-export class LeaveRequestInform extends BaseEntities {
+@Entity('LeaveRequestParticipants')
+export class LeaveRequestParticipants extends BaseEntities {
+  @Column({ nullable: true })
+  type: string;
+
   @Column({ nullable: true })
   employeeId: string;
 
@@ -15,7 +18,10 @@ export class LeaveRequestInform extends BaseEntities {
   @Column({ nullable: true })
   leaveRequestId: string;
 
-  @ManyToOne(() => LeaveRequest, (leaveRequest) => leaveRequest.informedRequests)
+  @ManyToOne(
+    () => LeaveRequest,
+    (leaveRequest) => leaveRequest.informedRequests,
+  )
   @JoinColumn({ name: 'leaveRequestId' })
   leaveRequests: LeaveRequest;
 }

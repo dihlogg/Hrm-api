@@ -10,9 +10,6 @@ export class JobTitle extends BaseEntities {
   @Column()
   description: string;
 
-  @Column()
-  displayOrder: number;
-
   @OneToMany(() => Employee, (employee) => employee.jobTitle)
   employees: Employee[];
 }

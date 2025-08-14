@@ -12,7 +12,7 @@ import { CreateLeaveRequestTypeDto } from './dto/create-leave-request-type.dto';
 import { UpdateLeaveRequestTypeDto } from './dto/update-leave-request-type.dto';
 import { LeaveRequestType } from './entities/leave-request-type.entity';
 
-@Controller('leaveRequestTypes')
+@Controller('LeaveRequestTypes')
 export class LeaveRequestTypeController {
   constructor(
     private readonly leaveRequestTypeService: LeaveRequestTypeService,

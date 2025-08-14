@@ -15,12 +15,7 @@ export class CreateLeaveRequestDto {
   @IsNotEmpty({ message: 'Employee ID is required' })
   @IsUUID('4', { message: 'Employee ID must be a valid UUID' })
   employeeId: string;
-
-  @ApiProperty()
-  @IsNotEmpty({ message: 'Approver ID is required' })
-  @IsUUID('4', { message: 'Approver ID must be a valid UUID' })
-  approverId: string;
-
+  
   @ApiProperty()
   @IsNotEmpty({ message: 'Partial Day ID is required' })
   @IsUUID('4', { message: 'Partial Day ID must be a valid UUID' })

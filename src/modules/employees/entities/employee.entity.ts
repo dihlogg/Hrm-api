@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { EmployeeStatus } from '../employee-status/entities/employee-status.entity';
 import { LeaveRequest } from 'src/modules/leave-requests/entities/leave-request.entity';
-import { LeaveRequestInform } from 'src/modules/leave-requests/leave-request-inform/entities/leave-request-inform.entity';
+import { LeaveRequestParticipants } from 'src/modules/leave-requests/leave-request-inform/entities/leave-request-inform.entity';
 
 @Entity('Employees')
 export class Employee extends BaseEntities {
@@ -74,9 +74,6 @@ export class Employee extends BaseEntities {
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
   leaveRequests: LeaveRequest[];
 
-  @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.approver)
-  approvedRequests: LeaveRequest[];
-
-  @OneToMany(() => LeaveRequestInform, (inform) => inform.employees)
-  informedRequests: LeaveRequestInform[];
+  @OneToMany(() => LeaveRequestParticipants, (participant) => participant.employees)
+  informedRequests: LeaveRequestParticipants[];
 }

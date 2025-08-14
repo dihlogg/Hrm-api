@@ -6,7 +6,4 @@ export class CreateJobTitleDto {
 
   @ApiProperty()
   description: string;
-
-  @ApiProperty()
-  displayOrder: number;
 }
