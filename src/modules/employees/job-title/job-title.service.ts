@@ -20,7 +20,7 @@ export class JobTitleService {
   async findAll(): Promise<JobTitle[]> {
     return await this.repo.find({
       order: {
-        displayOrder: 'ASC',
+        createDate: 'ASC',
       },
     });
   }

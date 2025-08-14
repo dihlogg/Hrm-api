@@ -4,7 +4,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { PartialDay } from '../partial-day/entities/partial-day.entity';
 import { LeaveStatus } from '../leave-status/entities/leave-status.entity';
 import { LeaveReason } from '../leave-reason/entities/leave-reason.entity';
-import { LeaveRequestInform } from '../leave-request-inform/entities/leave-request-inform.entity';
+import { LeaveRequestParticipants } from '../leave-request-inform/entities/leave-request-inform.entity';
 import { LeaveRequestType } from '../leave-request-type/entities/leave-request-type.entity';
 
 @Entity('LeaveRequests')
@@ -27,12 +27,6 @@ export class LeaveRequest extends BaseEntities {
   @ManyToOne(() => Employee, (employee) => employee.leaveRequests)
   @JoinColumn({ name: 'employeeId' })
   employee: Employee;
-
-  @Column({ nullable: true })
-  approverId: string;
-
-  @ManyToOne(() => Employee, (employee) => employee.approvedRequests)
-  approver: Employee;
 
   @Column({ nullable: true })
   partialDayId: string;
@@ -62,6 +56,6 @@ export class LeaveRequest extends BaseEntities {
   @JoinColumn({ name: 'leaveRequestTypeId' })
   leaveRequestType: LeaveRequestType;
 
-  @OneToMany(() => LeaveRequestInform, (inform) => inform.leaveRequests)
-  informedRequests: LeaveRequestInform[];
+  @OneToMany(() => LeaveRequestParticipants, (participant) => participant.leaveRequests)
+  informedRequests: LeaveRequestParticipants[];
 }

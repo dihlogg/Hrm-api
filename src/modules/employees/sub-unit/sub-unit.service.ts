@@ -19,7 +19,7 @@ export class SubUnitService {
   async findAll(): Promise<SubUnit[]> {
     return await this.repo.find({
       order: {
-        displayOrder: 'ASC'
+        createDate: 'ASC'
       }
     });
   }

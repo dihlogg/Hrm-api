@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -7,7 +6,7 @@ import { CreateLeaveRequestDto } from './dto/create-leave-request.dto';
 import { UpdateLeaveRequestDto } from './dto/update-leave-request.dto';
 import { LeaveRequest } from './entities/leave-request.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { LeaveStatus } from './leave-status/entities/leave-status.entity';
 import { LeaveReason } from './leave-reason/entities/leave-reason.entity';
 import { PartialDay } from './partial-day/entities/partial-day.entity';
@@ -51,7 +50,6 @@ export class LeaveRequestsService {
   ): Promise<LeaveRequest> {
     const {
       employeeId,
-      approverId,
       leaveStatusId,
       leaveReasonId,
       partialDayId,
@@ -60,22 +58,19 @@ export class LeaveRequestsService {
 
     const [
       employee,
-      approver,
       leaveStatus,
       leaveReason,
       partialDay,
       leaveRequestType,
     ] = await Promise.all([
       findEntityOrFail(this.employeeRepo, employeeId, 'Employee'),
-      findEntityOrFail(this.employeeRepo, approverId, 'Approver'),
       findEntityOrFail(this.leaveStatusRepo, leaveStatusId, 'LeaveStatus'),
       findEntityOrFail(this.leaveReasonRepo, leaveReasonId, 'LeaveReason'),
-      findEntityOrFail(this.partialDayRepo, partialDayId, 'PartialDay'),
       findEntityOrFail(this.partialDayRepo, partialDayId, 'PartialDay'),
       findEntityOrFail(
         this.leaveRequestTypeRepo,
         leaveRequestTypeId,
-        'leaveRequestType',
+        'LeaveRequestType',
       ),
     ]);
 
@@ -83,7 +78,6 @@ export class LeaveRequestsService {
       this.repo.create({
         ...createLeaveRequestDto,
         employee,
-        approver,
         leaveStatus,
         leaveReason,
         partialDay,
@@ -117,8 +111,10 @@ export class LeaveRequestsService {
 
     let query = this.repo
       .createQueryBuilder('leaveRequest')
-      .leftJoinAndSelect('leaveRequest.leaveRequestType', 'leaveRequestType')
-      .leftJoinAndSelect('leaveRequest.leaveStatus', 'leaveStatus');
+      .leftJoinAndSelect('leaveRequest.leaveStatus', 'leaveStatus')
+      .leftJoinAndSelect('leaveRequest.leaveReason', 'leaveReason')
+      .leftJoinAndSelect('leaveRequest.partialDay', 'partialDay')
+      .leftJoinAndSelect('leaveRequest.leaveRequestType', 'leaveRequestType');
 
     query = this.applyFilters(query, dto);
     query = this.applySorting(query, dto);
@@ -135,7 +131,8 @@ export class LeaveRequestsService {
     query: SelectQueryBuilder<LeaveRequest>,
     dto: GetLeaveRequestListDto,
   ) {
-    const { fromDate, toDate, leaveRequestTypeId, leaveStatusId } = dto;
+    const { fromDate, toDate, leaveRequestTypeId, leaveStatusId, employeeId } =
+      dto;
 
     if (fromDate && toDate) {
       query
@@ -156,6 +153,11 @@ export class LeaveRequestsService {
     if (leaveStatusId) {
       query.andWhere('leaveRequest.leaveStatusId = :leaveStatusId', {
         leaveStatusId,
+      });
+    }
+    if (employeeId) {
+      query.andWhere('leaveRequest.employeeId = :employeeId', {
+        employeeId,
       });
     }
 

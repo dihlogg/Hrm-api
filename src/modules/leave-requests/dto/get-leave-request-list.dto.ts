@@ -19,4 +19,5 @@ export class GetLeaveRequestListDto extends PaginationDto {
   @IsOptional() toDate?: string;
   @IsOptional() leaveStatusId?: string;
   @IsOptional() leaveRequestTypeId?: string;
+  @IsOptional() employeeId?: string;
 }

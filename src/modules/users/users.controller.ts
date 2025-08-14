@@ -7,6 +7,7 @@ import {
   Param,
   Put,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -73,5 +74,12 @@ export class UsersController {
   @Delete('DeleteUser/:id')
   async delete(@Param('id') id: string): Promise<boolean> {
     return this.usersService.delete(id);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user:read')
+  @Get('GetUserInfor')
+  getMe(@Req() req) {
+    return { userId: req.user.userId, username: req.user.userName };
   }
 }

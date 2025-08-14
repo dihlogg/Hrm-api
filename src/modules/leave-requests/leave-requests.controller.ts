@@ -14,7 +14,7 @@ import { UpdateLeaveRequestDto } from './dto/update-leave-request.dto';
 import { LeaveRequest } from './entities/leave-request.entity';
 import { GetLeaveRequestListDto } from './dto/get-leave-request-list.dto';
 
-@Controller('leave-requests')
+@Controller('LeaveRequests')
 export class LeaveRequestsController {
   constructor(private readonly leaveRequestsService: LeaveRequestsService) {}
 
@@ -53,8 +53,21 @@ export class LeaveRequestsController {
     return await this.leaveRequestsService.delete(id);
   }
 
+  //get leave request list
   @Get('GetLeaveRequestList')
   async GetLeaveRequestList(@Query() query: GetLeaveRequestListDto) {
     return this.leaveRequestsService.getLeaveRequestList(query);
+  }
+
+  //get leave request list by employe id == my-leave
+  @Get('GetLeaveRequestListByEmployeeId/:employeeId')
+  async getLeaveRequestListByEmployeeId(
+    @Param('employeeId') employeeId: string,
+    @Query() query: GetLeaveRequestListDto,
+  ) {
+    return this.leaveRequestsService.getLeaveRequestList({
+      ...query,
+      employeeId,
+    });
   }
 }

@@ -10,9 +10,6 @@ export class SubUnit extends BaseEntities {
   @Column()
   description: string;
 
-  @Column()
-  displayOrder: number;
-
   @OneToMany(() => Employee, (employee) => employee.subUnit)
   employees: Employee[];
 }
