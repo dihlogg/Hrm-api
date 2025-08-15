@@ -8,5 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([LeaveRequestParticipants])],
   controllers: [LeaveRequestInformController],
   providers: [LeaveRequestInformService],
+  exports: [TypeOrmModule, LeaveRequestInformService]
 })
 export class LeaveRequestInformModule {}

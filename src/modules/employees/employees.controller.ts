@@ -9,6 +9,7 @@ import {
   UseGuards,
   Query,
   Patch,
+  Req,
 } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
@@ -28,10 +29,18 @@ import { PaginationDto } from 'src/common/utils/pagination/pagination.dto';
 export class EmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}
 
-  //get all employees with pagination
+  //get all employees
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('employee:read')
   @Get('GetAllEmployees')
+  async getAllEmployees() {
+    return this.employeesService.findAll();
+  }
+
+  //get all employees with pagination
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('employee:read')
+  @Get('GetAllEmployeesWithPagination')
   async getPaginatedEmployees(@Query() query: PaginationDto) {
     return this.employeesService.getPaginatedEmployees(query);
   }

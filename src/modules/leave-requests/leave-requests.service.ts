@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateLeaveRequestDto } from './dto/create-leave-request.dto';
 import { UpdateLeaveRequestDto } from './dto/update-leave-request.dto';
 import { LeaveRequest } from './entities/leave-request.entity';
@@ -15,6 +12,7 @@ import { findEntityOrFail } from 'src/common/utils/findEntityOrFail.util';
 import { LeaveRequestType } from './leave-request-type/entities/leave-request-type.entity';
 import { GetLeaveRequestListDto } from './dto/get-leave-request-list.dto';
 import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
+import { LeaveRequestParticipants } from './leave-request-inform/entities/leave-request-inform.entity';
 
 @Injectable()
 export class LeaveRequestsService {
@@ -31,6 +29,8 @@ export class LeaveRequestsService {
     private readonly leaveRequestTypeRepo: Repository<LeaveRequestType>,
     @InjectRepository(Employee)
     private readonly employeeRepo: Repository<Employee>,
+    @InjectRepository(LeaveRequestParticipants)
+    private readonly participantsRepo: Repository<LeaveRequestParticipants>,
   ) {}
 
   async findAll(): Promise<LeaveRequest[]> {
@@ -50,40 +50,58 @@ export class LeaveRequestsService {
   ): Promise<LeaveRequest> {
     const {
       employeeId,
-      leaveStatusId,
       leaveReasonId,
       partialDayId,
       leaveRequestTypeId,
+      approverId,
+      informToId,
     } = createLeaveRequestDto;
+    const submittedStatusId = '0579fdeb-881d-4fdb-bde1-d75c4984d9b3';
 
-    const [
-      employee,
-      leaveStatus,
-      leaveReason,
-      partialDay,
-      leaveRequestType,
-    ] = await Promise.all([
-      findEntityOrFail(this.employeeRepo, employeeId, 'Employee'),
-      findEntityOrFail(this.leaveStatusRepo, leaveStatusId, 'LeaveStatus'),
-      findEntityOrFail(this.leaveReasonRepo, leaveReasonId, 'LeaveReason'),
-      findEntityOrFail(this.partialDayRepo, partialDayId, 'PartialDay'),
-      findEntityOrFail(
-        this.leaveRequestTypeRepo,
-        leaveRequestTypeId,
-        'LeaveRequestType',
-      ),
-    ]);
+    return await this.repo.manager.transaction(async (manager) => {
+      const [employee, leaveStatus, leaveReason, partialDay, leaveRequestType] =
+        await Promise.all([
+          findEntityOrFail(this.employeeRepo, employeeId, 'Employee'),
+          findEntityOrFail(
+            this.leaveStatusRepo,
+            submittedStatusId,
+            'LeaveStatus',
+          ),
+          findEntityOrFail(this.leaveReasonRepo, leaveReasonId, 'LeaveReason'),
+          findEntityOrFail(this.partialDayRepo, partialDayId, 'PartialDay'),
+          findEntityOrFail(
+            this.leaveRequestTypeRepo,
+            leaveRequestTypeId,
+            'LeaveRequestType',
+          ),
+        ]);
 
-    return await this.repo.save(
-      this.repo.create({
+      const leaveRequest = manager.create(LeaveRequest, {
         ...createLeaveRequestDto,
         employee,
         leaveStatus,
         leaveReason,
         partialDay,
         leaveRequestType,
-      }),
-    );
+      });
+      const savedLeaveRequest = await manager.save(leaveRequest);
+
+      const approverParticipant = manager.create(LeaveRequestParticipants, {
+        leaveRequestId: savedLeaveRequest.id,
+        employeeId: approverId,
+        type: 'approve',
+      });
+
+      const informParticipant = manager.create(LeaveRequestParticipants, {
+        leaveRequestId: savedLeaveRequest.id,
+        employeeId: informToId,
+        type: 'inform',
+      });
+
+      await manager.save([approverParticipant, informParticipant]);
+
+      return savedLeaveRequest;
+    });
   }
 
   async update(

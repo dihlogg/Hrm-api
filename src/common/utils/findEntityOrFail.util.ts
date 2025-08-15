@@ -7,7 +7,7 @@ export async function findEntityOrFail<T extends ObjectLiteral>(
   entityName: string,
 ): Promise<T> {
   if (!id) {
-    throw new NotFoundException(`${entityName} ID is required`);
+    throw new NotFoundException(`${entityName} Id is required`);
   }
 
   const entity = await repository.findOneBy({ id } as any);
