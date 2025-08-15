@@ -46,7 +46,7 @@ export class AuthService {
 
     const refreshToken = randomUUID();
     const refreshTtl =
-      this.configService.get<number>('JWT_REFRESH_TTL') || 7 * 24 * 60 * 60; // seconds
+      this.configService.get<number>('JWT_REFRESH_TTL') || 1 * 24 * 60 * 60; // seconds
     await this.redisClient.set(
       `refresh_token:${refreshToken}`,
       user.id.toString(),
@@ -93,7 +93,7 @@ export class AuthService {
 
       const newRefreshToken = randomUUID();
       const refreshTtl =
-        this.configService.get<number>('JWT_REFRESH_TTL') || 7 * 24 * 60 * 60;
+        this.configService.get<number>('JWT_REFRESH_TTL') || 1 * 24 * 60 * 60;
       await this.redisClient.set(
         `refresh_token:${newRefreshToken}`,
         user.id.toString(),

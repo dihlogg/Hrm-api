@@ -1,34 +1,68 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { LeaveRequestInformService } from './leave-request-inform.service';
-import { CreateLeaveRequestInformDto } from './dto/create-leave-request-inform.dto';
-import { UpdateLeaveRequestInformDto } from './dto/update-leave-request-inform.dto';
+import {
+  CreateLeaveRequestParticipantsDto,
+  CreateLeaveRequestWithManyParticipantsDto,
+} from './dto/create-leave-request-participants.dto';
+import { UpdateLeaveRequestParticipantsDto } from './dto/update-leave-request-participants.dto';
+import { LeaveRequestParticipants } from './entities/leave-request-inform.entity';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('leave-request-inform')
+@ApiTags('LeaveRequestParticipants')
+@Controller('LeaveRequestParticipants')
 export class LeaveRequestInformController {
-  constructor(private readonly leaveRequestInformService: LeaveRequestInformService) {}
+  constructor(
+    private readonly leaveRequestInformService: LeaveRequestInformService,
+  ) {}
 
-  @Post()
-  create(@Body() createLeaveRequestInformDto: CreateLeaveRequestInformDto) {
-    return this.leaveRequestInformService.create(createLeaveRequestInformDto);
-  }
-
-  @Get()
-  findAll() {
+  //get all
+  @Get('GetAllLeaveRequestParticipants')
+  async findAll(): Promise<LeaveRequestParticipants[]> {
     return this.leaveRequestInformService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.leaveRequestInformService.findOne(+id);
+  //get by id
+  @Get('GetLeaveRequestParticipantById/:id')
+  async findOne(@Param('id') id: string): Promise<LeaveRequestParticipants> {
+    return this.leaveRequestInformService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLeaveRequestInformDto: UpdateLeaveRequestInformDto) {
-    return this.leaveRequestInformService.update(+id, updateLeaveRequestInformDto);
+  //create
+  @Post('PostLeaveRequestParticipant')
+  async create(
+    @Body() createRequetDto: CreateLeaveRequestParticipantsDto,
+  ): Promise<LeaveRequestParticipants> {
+    return this.leaveRequestInformService.create(createRequetDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.leaveRequestInformService.remove(+id);
+  //create with 2 participants
+  @Post('PostLeaveRequestParticipants')
+  async createMultiple(
+    @Body() dto: CreateLeaveRequestWithManyParticipantsDto,
+  ): Promise<boolean> {
+    return this.leaveRequestInformService.createMultiple(dto);
+  }
+
+  //update
+  @Put('PutLeaveRequestParticipant/:id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateRequetDto: UpdateLeaveRequestParticipantsDto,
+  ): Promise<boolean> {
+    return this.leaveRequestInformService.update(id, updateRequetDto);
+  }
+
+  //delete
+  @Delete('DeleteLeaveRequestParticipant/:id')
+  async delete(@Param('id') id: string): Promise<boolean> {
+    return this.leaveRequestInformService.delete(id);
   }
 }
