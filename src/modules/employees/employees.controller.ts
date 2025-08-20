@@ -102,7 +102,26 @@ export class EmployeesController {
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('employee:read')
   @Get('GetEmployeeDetailsByUserId/:id')
-  async getEmployeeByUserId(@Param('id') id: string) {
+  async getEmployeeByUserId(@Param('id') id: string): Promise<Employee> {
     return this.employeesService.getEmployeeDetailsByUserId(id);
+  }
+
+  //get employees by sub unit
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('employee:read')
+  @Get('GetEmployeeBySubUnit/:subUnitId/exclude/:employeeId')
+  async getEmployeeBySubUnitId(
+    @Param('subUnitId') subUnitId: string,
+    @Param('employeeId') employeeId: string,
+  ): Promise<Employee[]> {
+    return this.employeesService.getEmployeesBySubUnit(subUnitId, employeeId);
+  }
+
+  //get supervisor employees
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('employee:read')
+  @Get('GetSupervisorEmployee/:id')
+  async getSupervisorEmployee(@Param('id') id: string) {
+    return this.employeesService.getSupervisorEmployee(id);
   }
 }
