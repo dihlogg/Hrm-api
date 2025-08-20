@@ -49,13 +49,19 @@ export class LeaveRequest extends BaseEntities {
   @JoinColumn({ name: 'leaveReasonId' })
   leaveReason: LeaveReason;
 
-    @Column({ nullable: true })
+  @Column({ nullable: true })
   leaveRequestTypeId: string;
 
-  @ManyToOne(() => LeaveRequestType, (leaveRequestType) => leaveRequestType.leaveRequests)
+  @ManyToOne(
+    () => LeaveRequestType,
+    (leaveRequestType) => leaveRequestType.leaveRequests,
+  )
   @JoinColumn({ name: 'leaveRequestTypeId' })
   leaveRequestType: LeaveRequestType;
 
-  @OneToMany(() => LeaveRequestParticipants, (participant) => participant.leaveRequests)
+  @OneToMany(
+    () => LeaveRequestParticipants,
+    (participant) => participant.leaveRequests,
+  )
   informedRequests: LeaveRequestParticipants[];
 }

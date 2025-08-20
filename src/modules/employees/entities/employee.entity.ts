@@ -74,6 +74,21 @@ export class Employee extends BaseEntities {
   @OneToMany(() => LeaveRequest, (leaveRequest) => leaveRequest.employee)
   leaveRequests: LeaveRequest[];
 
-  @OneToMany(() => LeaveRequestParticipants, (participant) => participant.employees)
+  @OneToMany(
+    () => LeaveRequestParticipants,
+    (participant) => participant.employees,
+  )
   informedRequests: LeaveRequestParticipants[];
+
+  @Column({ nullable: true })
+  parentId: string;
+
+  // Nhiều nhân viên có thể có cùng 1 supervisor
+  @ManyToOne(() => Employee, (employee) => employee.parentEmployees)
+  @JoinColumn({ name: 'parentId' })
+  supervisor: Employee;
+
+  // Một supervisor có thể có nhiều children nhân viên dưới quyền
+  @OneToMany(() => Employee, (employee) => employee.supervisor)
+  parentEmployees: Employee[];
 }

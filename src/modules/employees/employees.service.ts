@@ -129,6 +129,29 @@ export class EmployeesService {
     return employee;
   }
 
+  async getEmployeesBySubUnit(
+    subUnitId: string,
+    employeeId: string,
+  ): Promise<Employee[]> {
+    return await this.repo
+      .createQueryBuilder('employee')
+      .leftJoinAndSelect('employee.jobTitle', 'jobTitle')
+      .leftJoinAndSelect('employee.subUnit', 'subUnit')
+      .leftJoinAndSelect('employee.employeeStatus', 'employeeStatus')
+      .where('employee.subUnitId = :subUnitId', { subUnitId })
+      .andWhere('employee.id != :employeeId', { employeeId })
+      .getMany();
+  }
+
+  async getSupervisorEmployee(employeeId: string): Promise<Employee | null> {
+    const employee = await this.repo.findOne({
+      where: { id: employeeId },
+      relations: { supervisor: true },
+    });
+
+    return employee?.supervisor || null;
+  }
+
   async getEmployeeList(dto: GetEmployeeListDto) {
     const { page = 1, pageSize = 10 } = dto;
 
