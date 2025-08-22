@@ -78,7 +78,7 @@ export class Employee extends BaseEntities {
     () => LeaveRequestParticipants,
     (participant) => participant.employees,
   )
-  informedRequests: LeaveRequestParticipants[];
+  participantsRequests: LeaveRequestParticipants[];
 
   @Column({ nullable: true })
   parentId: string;

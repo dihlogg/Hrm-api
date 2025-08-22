@@ -63,5 +63,5 @@ export class LeaveRequest extends BaseEntities {
     () => LeaveRequestParticipants,
     (participant) => participant.leaveRequests,
   )
-  informedRequests: LeaveRequestParticipants[];
+  participantsRequests: LeaveRequestParticipants[];
 }
