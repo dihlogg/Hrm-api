@@ -38,7 +38,19 @@ export class LeaveRequestsService {
   }
 
   async findOne(id: string): Promise<LeaveRequest> {
-    const leaveRequest = await this.repo.findOne({ where: { id } });
+    const leaveRequest = await this.repo.findOne({ 
+      where: { id },
+      relations: [
+        'employee',
+        'leaveStatus',
+        'leaveReason',
+        'partialDay',
+        'leaveRequestType',
+        'participantsRequests',
+        'participantsRequests.employees'
+      ]
+    });
+    
     if (!leaveRequest) {
       throw new NotFoundException('Leave Request not found');
     }
@@ -129,10 +141,13 @@ export class LeaveRequestsService {
 
     let query = this.repo
       .createQueryBuilder('leaveRequest')
+      .leftJoinAndSelect('leaveRequest.employee', 'employee')
       .leftJoinAndSelect('leaveRequest.leaveStatus', 'leaveStatus')
       .leftJoinAndSelect('leaveRequest.leaveReason', 'leaveReason')
       .leftJoinAndSelect('leaveRequest.partialDay', 'partialDay')
-      .leftJoinAndSelect('leaveRequest.leaveRequestType', 'leaveRequestType');
+      .leftJoinAndSelect('leaveRequest.leaveRequestType', 'leaveRequestType')
+      .leftJoinAndSelect('leaveRequest.participantsRequests', 'participantsRequests')
+      .leftJoinAndSelect('participantsRequests.employees', 'participantEmployees')
 
     query = this.applyFilters(query, dto);
     query = this.applySorting(query, dto);

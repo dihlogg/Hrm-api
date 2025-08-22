@@ -11,7 +11,7 @@ export class LeaveRequestParticipants extends BaseEntities {
   @Column({ nullable: true })
   employeeId: string;
 
-  @ManyToOne(() => Employee, (employee) => employee.informedRequests)
+  @ManyToOne(() => Employee, (employee) => employee.participantsRequests)
   @JoinColumn({ name: 'employeeId' })
   employees: Employee;
 
@@ -20,7 +20,7 @@ export class LeaveRequestParticipants extends BaseEntities {
 
   @ManyToOne(
     () => LeaveRequest,
-    (leaveRequest) => leaveRequest.informedRequests,
+    (leaveRequest) => leaveRequest.participantsRequests,
   )
   @JoinColumn({ name: 'leaveRequestId' })
   leaveRequests: LeaveRequest;
