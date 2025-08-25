@@ -8,5 +8,5 @@ export class CreateLeaveRequestTypeDto {
   description: string;
 
   @ApiProperty()
-  displayOrder: number;
+  maximumAllowed: number;
 }

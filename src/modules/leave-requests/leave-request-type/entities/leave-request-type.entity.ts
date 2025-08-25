@@ -11,7 +11,7 @@ export class LeaveRequestType extends BaseEntities {
   description: string;
 
   @Column()
-  displayOrder: number;
+  maximumAllowed: number; //maximum days
 
   @OneToMany(
     () => LeaveRequest,
