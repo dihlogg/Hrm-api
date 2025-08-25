@@ -70,4 +70,10 @@ export class LeaveRequestsController {
       employeeId,
     });
   }
+
+  //get leave balances by employee id
+  @Get('GetLeaveBalancesByEmployeeId/:employeeId')
+  async getLeaveBalances(@Param('employeeId') employeeId: string) {
+    return this.leaveRequestsService.getLeaveBalancesByEmployee(employeeId);
+  }
 }

@@ -13,6 +13,7 @@ import { LeaveRequestType } from './leave-request-type/entities/leave-request-ty
 import { GetLeaveRequestListDto } from './dto/get-leave-request-list.dto';
 import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
 import { LeaveRequestParticipants } from './leave-request-inform/entities/leave-request-inform.entity';
+import { LeaveBalanceDto } from './dto/leave-balance.dto';
 
 @Injectable()
 export class LeaveRequestsService {
@@ -38,7 +39,7 @@ export class LeaveRequestsService {
   }
 
   async findOne(id: string): Promise<LeaveRequest> {
-    const leaveRequest = await this.repo.findOne({ 
+    const leaveRequest = await this.repo.findOne({
       where: { id },
       relations: [
         'employee',
@@ -47,10 +48,10 @@ export class LeaveRequestsService {
         'partialDay',
         'leaveRequestType',
         'participantsRequests',
-        'participantsRequests.employees'
-      ]
+        'participantsRequests.employees',
+      ],
     });
-    
+
     if (!leaveRequest) {
       throw new NotFoundException('Leave Request not found');
     }
@@ -136,6 +137,45 @@ export class LeaveRequestsService {
     return true;
   }
 
+  async getLeaveBalancesByEmployee(
+    employeeId: string,
+  ): Promise<LeaveBalanceDto[]> {
+    const leaveTypes = await this.leaveRequestTypeRepo.find();
+
+    const leaveRequests = await this.repo.find({
+      where: { employeeId },
+      relations: ['leaveStatus', 'leaveRequestType'],
+    });
+
+    return leaveTypes.map((type) => {
+      const requestsOfType = leaveRequests.filter(
+        (req) => req.leaveRequestTypeId === type.id,
+      );
+
+      // Approved
+      const approvedQuotas = requestsOfType
+        .filter((req) => req.leaveStatus?.name === 'Approved')
+        .reduce((sum, req) => sum + (Number(req.duration) || 0), 0);
+
+      // Pending
+      const pendingQuotas = requestsOfType
+        .filter((req) => req.leaveStatus?.name === 'Pending')
+        .reduce((sum, req) => sum + (Number(req.duration) || 0), 0);
+
+      // Remaining
+      const remainingQuotas = type.maximumAllowed - approvedQuotas;
+
+      return {
+        leaveRequestTypeId: type.id,
+        leaveRequestTypeName: type.name,
+        maximumAllowed: type.maximumAllowed,
+        approvedQuotas,
+        pendingQuotas,
+        remainingQuotas,
+      };
+    });
+  }
+
   async getLeaveRequestList(dto: GetLeaveRequestListDto) {
     const { page = 1, pageSize = 10 } = dto;
 
@@ -146,8 +186,14 @@ export class LeaveRequestsService {
       .leftJoinAndSelect('leaveRequest.leaveReason', 'leaveReason')
       .leftJoinAndSelect('leaveRequest.partialDay', 'partialDay')
       .leftJoinAndSelect('leaveRequest.leaveRequestType', 'leaveRequestType')
-      .leftJoinAndSelect('leaveRequest.participantsRequests', 'participantsRequests')
-      .leftJoinAndSelect('participantsRequests.employees', 'participantEmployees')
+      .leftJoinAndSelect(
+        'leaveRequest.participantsRequests',
+        'participantsRequests',
+      )
+      .leftJoinAndSelect(
+        'participantsRequests.employees',
+        'participantEmployees',
+      );
 
     query = this.applyFilters(query, dto);
     query = this.applySorting(query, dto);
