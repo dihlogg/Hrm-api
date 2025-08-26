@@ -15,8 +15,8 @@ export class LeaveRequest extends BaseEntities {
   @Column({ type: 'timestamptz' })
   toDate: Date;
 
-  @Column({ nullable: true })
-  duration: string;
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0, nullable: true })
+  duration: number;
 
   @Column({ nullable: true })
   reasonDetails: string;

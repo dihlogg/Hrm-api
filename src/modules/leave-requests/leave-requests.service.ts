@@ -155,12 +155,12 @@ export class LeaveRequestsService {
       // Approved
       const approvedQuotas = requestsOfType
         .filter((req) => req.leaveStatus?.name === 'Approved')
-        .reduce((sum, req) => sum + (Number(req.duration) || 0), 0);
+        .reduce((sum, req) => sum + Number(req.duration || 0), 0);
 
       // Pending
       const pendingQuotas = requestsOfType
         .filter((req) => req.leaveStatus?.name === 'Pending')
-        .reduce((sum, req) => sum + (Number(req.duration) || 0), 0);
+        .reduce((sum, req) => sum + Number(req.duration || 0), 0);
 
       // Remaining
       const remainingQuotas = type.maximumAllowed - approvedQuotas;

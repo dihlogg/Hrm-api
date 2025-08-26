@@ -9,6 +9,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LeaveRequest } from './entities/leave-request.entity';
 import { EmployeesModule } from '../employees/employees.module';
 import { LeaveRequestTypeModule } from './leave-request-type/leave-request-type.module';
+import { AuthModule } from '../auth/auth.module';
+import { PermissionsModule } from '../permissions/permissions.module';
 
 @Module({
   imports: [
@@ -18,7 +20,9 @@ import { LeaveRequestTypeModule } from './leave-request-type/leave-request-type.
     LeaveReasonModule,
     LeaveRequestInformModule,
     EmployeesModule,
-    LeaveRequestTypeModule
+    LeaveRequestTypeModule,
+    AuthModule,
+    PermissionsModule,
   ],
   controllers: [LeaveRequestsController],
   providers: [LeaveRequestsService],
