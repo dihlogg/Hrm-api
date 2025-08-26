@@ -8,7 +8,6 @@ import { Permission } from './entities/permission.entity';
 import { AuthModule } from '../auth/auth.module';
 import { UserRole } from '../user-role/entities/user-role.entity';
 import { User } from '../users/entities/user.entity';
-import { Role } from '../roles/entities/role.entity';
 
 @Module({
   imports: [

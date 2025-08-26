@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
 
 export class CreateLeaveRequestDto {
   @ApiProperty()
@@ -8,8 +8,9 @@ export class CreateLeaveRequestDto {
   @ApiProperty()
   toDate: Date;
 
+  @IsNumber({ maxDecimalPlaces: 2 })
   @ApiProperty()
-  duration: string;
+  duration: number;
 
   @ApiProperty()
   @IsNotEmpty({ message: 'Employee Id is required' })

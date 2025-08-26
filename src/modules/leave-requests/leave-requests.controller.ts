@@ -7,30 +7,43 @@ import {
   Delete,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { LeaveRequestsService } from './leave-requests.service';
 import { CreateLeaveRequestDto } from './dto/create-leave-request.dto';
 import { UpdateLeaveRequestDto } from './dto/update-leave-request.dto';
 import { LeaveRequest } from './entities/leave-request.entity';
 import { GetLeaveRequestListDto } from './dto/get-leave-request-list.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { PermissionsGuard } from 'src/common/guards/permissions.guard';
+import { Permissions } from 'src/common/decorators/permissions.decorator';
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('LeaveRequests')
 export class LeaveRequestsController {
   constructor(private readonly leaveRequestsService: LeaveRequestsService) {}
 
   //get all leave request
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
   @Get('GetAllLeaveRequests')
   async findAll(): Promise<LeaveRequest[]> {
     return await this.leaveRequestsService.findAll();
   }
 
   //get leave request by id
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
   @Get('GetLeaveRequestById/:id')
   async findOne(@Param('id') id: string): Promise<LeaveRequest> {
     return await this.leaveRequestsService.findOne(id);
   }
 
   //create new leave request
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:create')
   @Post('PostLeaveRequest')
   async create(
     @Body() createLeaveRequestDto: CreateLeaveRequestDto,
@@ -39,6 +52,8 @@ export class LeaveRequestsController {
   }
 
   //update leave request
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:update')
   @Put('PutLeaveRequest/:id')
   async update(
     @Param('id') id: string,
@@ -47,19 +62,25 @@ export class LeaveRequestsController {
     return await this.leaveRequestsService.update(id, updateLeaveRequestDto);
   }
 
-  //delete leave request
+  //delete leave
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:delete')
   @Delete('DeleteLeaveRequest/:id')
   async delete(@Param('id') id: string): Promise<boolean> {
     return await this.leaveRequestsService.delete(id);
   }
 
   //get leave request list
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
   @Get('GetLeaveRequestList')
   async GetLeaveRequestList(@Query() query: GetLeaveRequestListDto) {
     return this.leaveRequestsService.getLeaveRequestList(query);
   }
 
   //get leave request list by employe id == my-leave
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
   @Get('GetLeaveRequestListByEmployeeId/:employeeId')
   async getLeaveRequestListByEmployeeId(
     @Param('employeeId') employeeId: string,
@@ -72,6 +93,8 @@ export class LeaveRequestsController {
   }
 
   //get leave balances by employee id
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
   @Get('GetLeaveBalancesByEmployeeId/:employeeId')
   async getLeaveBalances(@Param('employeeId') employeeId: string) {
     return this.leaveRequestsService.getLeaveBalancesByEmployee(employeeId);
