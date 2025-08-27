@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateLeaveRequestDto } from './dto/create-leave-request.dto';
 import { UpdateLeaveRequestDto } from './dto/update-leave-request.dto';
 import { LeaveRequest } from './entities/leave-request.entity';
@@ -129,6 +133,34 @@ export class LeaveRequestsService {
     return true;
   }
 
+  async updateLeaveRequestStatus(
+    id: string,
+    statusCode: string,
+  ): Promise<boolean> {
+    const status = await this.leaveStatusRepo.findOne({
+      where: { statusCode },
+    });
+
+    if (!status) {
+      throw new NotFoundException(
+        `Leave status with code "${statusCode}" not found in database`,
+      );
+    }
+
+    const leaveRequest = await this.repo.findOne({ where: { id } });
+    if (!leaveRequest) {
+      throw new NotFoundException('Leave request not found');
+    }
+    if (leaveRequest.leaveStatusId === status.id) {
+      throw new BadRequestException(
+        `This leave request is already in status "${statusCode}"`,
+      );
+    }
+
+    await this.repo.update(id, { leaveStatusId: status.id });
+    return true;
+  }
+
   async delete(id: string): Promise<boolean> {
     const result = await this.repo.delete(id);
     if (result.affected === 0) {
@@ -174,6 +206,18 @@ export class LeaveRequestsService {
         remainingQuotas,
       };
     });
+  }
+
+  async getLeaveRequestsForSupervisor(
+    supervisorId: string,
+  ): Promise<LeaveRequest[]> {
+    const result = await this.repo
+      .createQueryBuilder('leaveRequest')
+      .innerJoinAndSelect('leaveRequest.employee', 'employee')
+      .where('employee.parentId = :supervisorId', { supervisorId })
+      .getMany();
+
+    return result;
   }
 
   async getLeaveRequestList(dto: GetLeaveRequestListDto) {

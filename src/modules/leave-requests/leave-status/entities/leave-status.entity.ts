@@ -10,6 +10,9 @@ export class LeaveStatus extends BaseEntities {
   @Column()
   description: string;
 
+  @Column({ unique: true, nullable: true })
+  statusCode: string;
+
   @Column()
   displayOrder: number;
 

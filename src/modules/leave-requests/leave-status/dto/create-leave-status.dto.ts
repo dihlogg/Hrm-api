@@ -9,4 +9,7 @@ export class CreateLeaveStatusDto {
 
   @ApiProperty()
   displayOrder: number;
+
+  @ApiProperty()
+  statusCode: string;
 }

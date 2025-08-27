@@ -11,6 +11,7 @@ import { EmployeesModule } from '../employees/employees.module';
 import { LeaveRequestTypeModule } from './leave-request-type/leave-request-type.module';
 import { AuthModule } from '../auth/auth.module';
 import { PermissionsModule } from '../permissions/permissions.module';
+import { LeavePolicyModule } from './leave-policy/leave-policy.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PermissionsModule } from '../permissions/permissions.module';
     LeaveRequestTypeModule,
     AuthModule,
     PermissionsModule,
+    LeavePolicyModule,
   ],
   controllers: [LeaveRequestsController],
   providers: [LeaveRequestsService],
