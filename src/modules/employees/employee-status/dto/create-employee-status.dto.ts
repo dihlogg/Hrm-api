@@ -9,4 +9,7 @@ export class CreateEmployeeStatusDto {
 
   @ApiProperty()
   displayOrder: number;
+
+  @ApiProperty()
+  statusCode: string;
 }

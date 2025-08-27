@@ -13,11 +13,14 @@ import { DataSource } from 'typeorm';
 import { GetEmployeeListDto } from './dto/get-employee-list.dto';
 import { PaginationDto } from 'src/common/utils/pagination/pagination.dto';
 import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
+import { EmployeeStatus } from './employee-status/entities/employee-status.entity';
 
 @Injectable()
 export class EmployeesService {
   constructor(
     @InjectRepository(Employee) private readonly repo: Repository<Employee>,
+    @InjectRepository(EmployeeStatus)
+    private readonly employeeStatusRepo: Repository<EmployeeStatus>,
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
   ) {}
@@ -91,17 +94,21 @@ export class EmployeesService {
   }
 
   async updateEmployeeStatus(id: string): Promise<boolean> {
-    const ON_LEAVE_STATUS_ID = 'a0ed70e2-05d0-4620-b27a-a4881fe9f5b3';
+    const status = await this.employeeStatusRepo.findOne({
+      where: { statusCode: 'ON_LEAVE' },
+    });
+    if (!status) {
+      throw new NotFoundException('Status ON_LEAVE not found in database');
+    }
     const employee = await this.repo.findOne({ where: { id } });
-
     if (!employee) {
       throw new NotFoundException('Employee not found');
     }
-    if (employee.employeeStatusId === ON_LEAVE_STATUS_ID) {
+    if (employee.employeeStatusId === status.id) {
       throw new BadRequestException('This employee is already on leave');
     }
 
-    await this.repo.update(id, { employeeStatusId: ON_LEAVE_STATUS_ID });
+    await this.repo.update(id, { employeeStatusId: status.id });
     return true;
   }
 

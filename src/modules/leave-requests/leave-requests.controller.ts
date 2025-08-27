@@ -8,6 +8,7 @@ import {
   Put,
   Query,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { LeaveRequestsService } from './leave-requests.service';
 import { CreateLeaveRequestDto } from './dto/create-leave-request.dto';
@@ -98,5 +99,28 @@ export class LeaveRequestsController {
   @Get('GetLeaveBalancesByEmployeeId/:employeeId')
   async getLeaveBalances(@Param('employeeId') employeeId: string) {
     return this.leaveRequestsService.getLeaveBalancesByEmployee(employeeId);
+  }
+
+  //get leave request for supervisor
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
+  @Get('GetLeaveRequestsForSupervisor/:supervisorId')
+  async getLeaveRequestsForSupervisor(
+    @Param('supervisorId') supervisorId: string,
+  ) {
+    return this.leaveRequestsService.getLeaveRequestsForSupervisor(
+      supervisorId,
+    );
+  }
+
+  //update leave request status
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:update')
+  @Patch('PatchLeaveRequestStatus/:id/status/:statusCode')
+  async updateLeaveRequestStatus(
+    @Param('id') id: string,
+    @Param('statusCode') statusCode: string,
+  ) {
+    return this.leaveRequestsService.updateLeaveRequestStatus(id, statusCode);
   }
 }
