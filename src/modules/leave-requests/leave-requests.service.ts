@@ -208,22 +208,66 @@ export class LeaveRequestsService {
     });
   }
 
-  async getLeaveRequestsForSupervisor(
-    supervisorId: string,
-  ): Promise<LeaveRequest[]> {
-    const result = await this.repo
-      .createQueryBuilder('leaveRequest')
-      .innerJoinAndSelect('leaveRequest.employee', 'employee')
-      .where('employee.parentId = :supervisorId', { supervisorId })
-      .getMany();
-
-    return result;
-  }
-
   async getLeaveRequestList(dto: GetLeaveRequestListDto) {
     const { page = 1, pageSize = 10 } = dto;
 
-    let query = this.repo
+    let query = this.buildBaseQuery();
+
+    query = this.applyFilters(query, dto);
+    query = this.applySorting(query, dto);
+
+    return paginateAndFormat(query, {
+      page: Number(page),
+      pageSize: Number(pageSize),
+      useQueryBuilder: true,
+      queryBuilder: query,
+    });
+  }
+
+  async getLeaveRequestListByEmployeeId(
+  employeeId: string,
+  dto: GetLeaveRequestListDto,
+) {
+  const { page = 1, pageSize = 10 } = dto;
+
+  let query = this.buildBaseQuery()
+    .where('leaveRequest.employeeId = :employeeId', { employeeId });
+
+  query = this.applyFilters(query, dto);
+  query = this.applySorting(query, dto);
+
+  return paginateAndFormat(query, {
+    page: Number(page),
+    pageSize: Number(pageSize),
+    useQueryBuilder: true,
+    queryBuilder: query,
+  });
+}
+
+  async getLeaveRequestsForSupervisor(
+    supervisorId: string,
+    dto: GetLeaveRequestListDto,
+  ) {
+    const { page = 1, pageSize = 10 } = dto;
+
+    let query = this.buildBaseQuery().where(
+      'employee.parentId = :supervisorId',
+      { supervisorId },
+    );
+
+    query = this.applyFilters(query, dto);
+    query = this.applySorting(query, dto);
+
+    return paginateAndFormat(query, {
+      page: Number(page),
+      pageSize: Number(pageSize),
+      useQueryBuilder: true,
+      queryBuilder: query,
+    });
+  }
+
+  private buildBaseQuery() {
+    return this.repo
       .createQueryBuilder('leaveRequest')
       .leftJoinAndSelect('leaveRequest.employee', 'employee')
       .leftJoinAndSelect('leaveRequest.leaveStatus', 'leaveStatus')
@@ -238,16 +282,6 @@ export class LeaveRequestsService {
         'participantsRequests.employees',
         'participantEmployees',
       );
-
-    query = this.applyFilters(query, dto);
-    query = this.applySorting(query, dto);
-
-    return paginateAndFormat(query, {
-      page: Number(page),
-      pageSize: Number(pageSize),
-      useQueryBuilder: true,
-      queryBuilder: query,
-    });
   }
 
   private applyFilters(

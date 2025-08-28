@@ -79,17 +79,13 @@ export class LeaveRequestsController {
     return this.leaveRequestsService.getLeaveRequestList(query);
   }
 
-  //get leave request list by employe id == my-leave
+  //get leave request list
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('leave-request:read')
-  @Get('GetLeaveRequestListByEmployeeId/:employeeId')
-  async getLeaveRequestListByEmployeeId(
-    @Param('employeeId') employeeId: string,
-    @Query() query: GetLeaveRequestListDto,
-  ) {
+  @Get('GetLeaveRequestListByEmployeeId')
+  async getLeaveRequestList(@Query() query: GetLeaveRequestListDto) {
     return this.leaveRequestsService.getLeaveRequestList({
       ...query,
-      employeeId,
     });
   }
 
@@ -101,15 +97,31 @@ export class LeaveRequestsController {
     return this.leaveRequestsService.getLeaveBalancesByEmployee(employeeId);
   }
 
-  //get leave request for supervisor
+  //get leave request list by employe id == my-leave
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
+  @Get('GetLeaveRequestListByEmployeeId/:employeeId')
+  async getLeaveRequestListByEmployeeId(
+    @Param('employeeId') employeeId: string,
+    @Query() query: GetLeaveRequestListDto,
+  ) {
+    return this.leaveRequestsService.getLeaveRequestListByEmployeeId(
+      employeeId,
+      query,
+    );
+  }
+
+  // get leave request for supervisor
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('leave-request:read')
   @Get('GetLeaveRequestsForSupervisor/:supervisorId')
   async getLeaveRequestsForSupervisor(
     @Param('supervisorId') supervisorId: string,
+    @Query() query: GetLeaveRequestListDto,
   ) {
     return this.leaveRequestsService.getLeaveRequestsForSupervisor(
       supervisorId,
+      query,
     );
   }
 
