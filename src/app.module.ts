@@ -22,6 +22,7 @@ import { LeaveReasonModule } from './modules/leave-requests/leave-reason/leave-r
 import { PartialDayModule } from './modules/leave-requests/partial-day/partial-day.module';
 import { LeaveRequestInformModule } from './modules/leave-requests/leave-request-inform/leave-request-inform.module';
 import { LeaveRequestTypeModule } from './modules/leave-requests/leave-request-type/leave-request-type.module';
+import { LeavePolicyModule } from './modules/leave-requests/leave-policy/leave-policy.module';
 
 
 @Module({
@@ -55,7 +56,8 @@ import { LeaveRequestTypeModule } from './modules/leave-requests/leave-request-t
     LeaveReasonModule,
     PartialDayModule,
     LeaveRequestInformModule,
-    LeaveRequestTypeModule
+    LeaveRequestTypeModule,
+    LeavePolicyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
