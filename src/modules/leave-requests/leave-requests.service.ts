@@ -70,9 +70,11 @@ export class LeaveRequestsService {
       leaveReasonId,
       partialDayId,
       leaveRequestTypeId,
-      approverId,
-      informToId,
+      expectedApproverId,
+      expectedInformToId,
+      expectedConfirmId,
     } = createLeaveRequestDto;
+
     const submittedStatusId = '0579fdeb-881d-4fdb-bde1-d75c4984d9b3';
 
     return await this.repo.manager.transaction(async (manager) => {
@@ -100,24 +102,12 @@ export class LeaveRequestsService {
         leaveReason,
         partialDay,
         leaveRequestType,
-      });
-      const savedLeaveRequest = await manager.save(leaveRequest);
-
-      const approverParticipant = manager.create(LeaveRequestParticipants, {
-        leaveRequestId: savedLeaveRequest.id,
-        employeeId: approverId,
-        type: 'approve',
+        expectedApproverId,
+        expectedInformToId,
+        expectedConfirmId,
       });
 
-      const informParticipant = manager.create(LeaveRequestParticipants, {
-        leaveRequestId: savedLeaveRequest.id,
-        employeeId: informToId,
-        type: 'inform',
-      });
-
-      await manager.save([approverParticipant, informParticipant]);
-
-      return savedLeaveRequest;
+      return await manager.save(leaveRequest);
     });
   }
 
@@ -140,17 +130,19 @@ export class LeaveRequestsService {
     const status = await this.leaveStatusRepo.findOne({
       where: { statusCode },
     });
-
     if (!status) {
       throw new NotFoundException(
         `Leave status with code "${statusCode}" not found in database`,
       );
     }
-
-    const leaveRequest = await this.repo.findOne({ where: { id } });
+    const leaveRequest = await this.repo.findOne({
+      where: { id },
+      relations: ['employee'],
+    });
     if (!leaveRequest) {
       throw new NotFoundException('Leave request not found');
     }
+
     if (leaveRequest.leaveStatusId === status.id) {
       throw new BadRequestException(
         `This leave request is already in status "${statusCode}"`,
@@ -158,6 +150,49 @@ export class LeaveRequestsService {
     }
 
     await this.repo.update(id, { leaveStatusId: status.id });
+
+    // 4. Insert participants log flow stt(approve, confirm, inform, reject)
+    if (statusCode === 'CONFIRM') {
+      await this.participantsRepo.save({
+        leaveRequestId: leaveRequest.id,
+        employeeId: leaveRequest.expectedConfirmId, // PM confirm (expected)
+        type: 'confirm',
+      });
+    }
+
+    if (statusCode === 'PENDING') {
+      await this.participantsRepo.save({
+        leaveRequestId: leaveRequest.id,
+        employeeId: leaveRequest.expectedConfirmId, // PM confirm (expected)
+        type: 'pending',
+      });
+    }
+
+    if (statusCode === 'APPROVED') {
+      await this.participantsRepo.save({
+        leaveRequestId: leaveRequest.id,
+        employeeId: leaveRequest.expectedApproverId, // Director approve (expected)
+        type: 'approve',
+      });
+
+      if (leaveRequest.expectedInformToId) {
+        await this.participantsRepo.save({
+          leaveRequestId: leaveRequest.id,
+          employeeId: leaveRequest.expectedInformToId, // notify user (expected)
+          type: 'inform',
+        });
+      }
+    }
+
+    if (statusCode === 'REJECTED') {
+      await this.participantsRepo.save({
+        leaveRequestId: leaveRequest.id,
+        employeeId:
+          leaveRequest.expectedConfirmId ?? leaveRequest.expectedApproverId, // Nếu reject ở bước PM thì confirmId, nếu reject ở bước Director thì approverId
+        type: 'reject',
+      });
+    }
+
     return true;
   }
 
@@ -225,24 +260,26 @@ export class LeaveRequestsService {
   }
 
   async getLeaveRequestListByEmployeeId(
-  employeeId: string,
-  dto: GetLeaveRequestListDto,
-) {
-  const { page = 1, pageSize = 10 } = dto;
+    employeeId: string,
+    dto: GetLeaveRequestListDto,
+  ) {
+    const { page = 1, pageSize = 10 } = dto;
 
-  let query = this.buildBaseQuery()
-    .where('leaveRequest.employeeId = :employeeId', { employeeId });
+    let query = this.buildBaseQuery().where(
+      'leaveRequest.employeeId = :employeeId',
+      { employeeId },
+    );
 
-  query = this.applyFilters(query, dto);
-  query = this.applySorting(query, dto);
+    query = this.applyFilters(query, dto);
+    query = this.applySorting(query, dto);
 
-  return paginateAndFormat(query, {
-    page: Number(page),
-    pageSize: Number(pageSize),
-    useQueryBuilder: true,
-    queryBuilder: query,
-  });
-}
+    return paginateAndFormat(query, {
+      page: Number(page),
+      pageSize: Number(pageSize),
+      useQueryBuilder: true,
+      queryBuilder: query,
+    });
+  }
 
   async getLeaveRequestsForSupervisor(
     supervisorId: string,

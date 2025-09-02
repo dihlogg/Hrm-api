@@ -150,6 +150,20 @@ export class EmployeesService {
       .getMany();
   }
 
+async getManagersBySubUnit(subUnitId: string): Promise<Employee[]> {
+  return await this.repo
+    .createQueryBuilder('employee')
+    .leftJoinAndSelect('employee.subUnit', 'subUnit')
+    .leftJoinAndSelect('employee.jobTitle', 'jobTitle')
+    .leftJoinAndSelect('employee.employeeStatus', 'employeeStatus')
+    .leftJoin('employee.user', 'user') // join sang Users
+    .leftJoin('user.userRole', 'userRole') // join sang UserRole
+    .leftJoin('userRole.role', 'role') // join sang Roles
+    .where('employee.subUnitId = :subUnitId', { subUnitId })
+    .andWhere('role.name = :roleName', { roleName: 'Manager' })
+    .getMany();
+}
+
   async getSupervisorEmployee(employeeId: string): Promise<Employee | null> {
     const employee = await this.repo.findOne({
       where: { id: employeeId },
