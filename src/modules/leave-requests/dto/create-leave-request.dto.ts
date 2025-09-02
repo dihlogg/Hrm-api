@@ -20,12 +20,17 @@ export class CreateLeaveRequestDto {
   @ApiProperty()
   @IsNotEmpty({ message: 'Approve Id is required' })
   @IsUUID('4', { message: 'Approve Id must be a valid UUID' })
-  approverId: string;
+  expectedApproverId: string;
 
   @ApiProperty()
   @IsNotEmpty({ message: 'InformTo Id is required' })
   @IsUUID('4', { message: 'InformTo Id must be a valid UUID' })
-  informToId: string;
+  expectedInformToId: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'confirm Id is required' })
+  @IsUUID('4', { message: 'confirm Id must be a valid UUID' })
+  expectedConfirmId: string;
 
   @ApiProperty()
   @IsNotEmpty({ message: 'Partial Day Id is required' })
