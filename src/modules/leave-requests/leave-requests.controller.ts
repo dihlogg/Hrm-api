@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Patch,
+  UseInterceptors,
 } from '@nestjs/common';
 import { LeaveRequestsService } from './leave-requests.service';
 import { CreateLeaveRequestDto } from './dto/create-leave-request.dto';
@@ -19,8 +20,10 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { LeaveRequestFilterInterceptor } from 'src/common/interceptors/leave-request-filter.interceptor';
 
 @ApiBearerAuth()
+@UseInterceptors(LeaveRequestFilterInterceptor)
 @UseGuards(JwtAuthGuard)
 @Controller('LeaveRequests')
 export class LeaveRequestsController {
@@ -121,6 +124,20 @@ export class LeaveRequestsController {
   ) {
     return this.leaveRequestsService.getLeaveRequestsForSupervisor(
       supervisorId,
+      query,
+    );
+  }
+
+  // get leave request for manager
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
+  @Get('getLeaveRequestForManager/:managerId')
+  async getLeaveRequestForManager(
+    @Param('managerId') managerId: string,
+    @Query() query: GetLeaveRequestListDto,
+  ) {
+    return this.leaveRequestsService.getLeaveRequestsForManager(
+      managerId,
       query,
     );
   }
