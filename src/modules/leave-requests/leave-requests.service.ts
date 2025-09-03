@@ -152,7 +152,7 @@ export class LeaveRequestsService {
     await this.repo.update(id, { leaveStatusId: status.id });
 
     // 4. Insert participants log flow stt(approve, confirm, inform, reject)
-    if (statusCode === 'CONFIRM') {
+    if (statusCode === 'CONFIRMED') {
       await this.participantsRepo.save({
         leaveRequestId: leaveRequest.id,
         employeeId: leaveRequest.expectedConfirmId, // PM confirm (expected)
@@ -291,6 +291,28 @@ export class LeaveRequestsService {
       'employee.parentId = :supervisorId',
       { supervisorId },
     );
+
+    query = this.applyFilters(query, dto);
+    query = this.applySorting(query, dto);
+
+    return paginateAndFormat(query, {
+      page: Number(page),
+      pageSize: Number(pageSize),
+      useQueryBuilder: true,
+      queryBuilder: query,
+    });
+  }
+
+  async getLeaveRequestsForManager(
+    managerId: string,
+    dto: GetLeaveRequestListDto,
+  ) {
+    const { page = 1, pageSize = 10 } = dto;
+
+    let query = this.buildBaseQuery()
+      .leftJoinAndSelect('employee.supervisor', 'pm')
+      .leftJoinAndSelect('pm.supervisor', 'manager')
+      .where('manager.id = :managerId', { managerId });
 
     query = this.applyFilters(query, dto);
     query = this.applySorting(query, dto);
