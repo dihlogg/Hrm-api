@@ -303,16 +303,17 @@ export class LeaveRequestsService {
     });
   }
 
-  async getLeaveRequestsForManager(
-    managerId: string,
+  async getLeaveRequestsForDirector(
+    directorId: string,
     dto: GetLeaveRequestListDto,
   ) {
     const { page = 1, pageSize = 10 } = dto;
 
     let query = this.buildBaseQuery()
-      .leftJoinAndSelect('employee.supervisor', 'pm')
-      .leftJoinAndSelect('pm.supervisor', 'manager')
-      .where('manager.id = :managerId', { managerId });
+      .leftJoinAndSelect('employee.supervisor', 'manager')
+      .leftJoinAndSelect('manager.supervisor', 'director')
+      .where('director.id = :directorId', { directorId })
+      .orWhere('employee.supervisor = :directorId', { directorId });
 
     query = this.applyFilters(query, dto);
     query = this.applySorting(query, dto);
