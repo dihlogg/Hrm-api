@@ -150,7 +150,7 @@ export class EmployeesService {
       .getMany();
   }
 
-async getManagersBySubUnit(subUnitId: string): Promise<Employee[]> {
+async getDirectorBySubUnit(subUnitId: string): Promise<Employee[]> {
   return await this.repo
     .createQueryBuilder('employee')
     .leftJoinAndSelect('employee.subUnit', 'subUnit')
@@ -160,7 +160,7 @@ async getManagersBySubUnit(subUnitId: string): Promise<Employee[]> {
     .leftJoin('user.userRole', 'userRole') // join sang UserRole
     .leftJoin('userRole.role', 'role') // join sang Roles
     .where('employee.subUnitId = :subUnitId', { subUnitId })
-    .andWhere('role.name = :roleName', { roleName: 'Manager' })
+    .andWhere('role.name = :roleName', { roleName: 'Director' })
     .getMany();
 }
 

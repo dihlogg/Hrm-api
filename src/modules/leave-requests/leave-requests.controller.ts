@@ -114,7 +114,7 @@ export class LeaveRequestsController {
     );
   }
 
-  // get leave request for supervisor
+  // get leave request for supervisor(manager)
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('leave-request:read')
   @Get('GetLeaveRequestsForSupervisor/:supervisorId')
@@ -128,16 +128,16 @@ export class LeaveRequestsController {
     );
   }
 
-  // get leave request for manager
+  // get leave request for director
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('leave-request:read')
-  @Get('getLeaveRequestForManager/:managerId')
-  async getLeaveRequestForManager(
-    @Param('managerId') managerId: string,
+  @Get('getLeaveRequestForDirector/:directorId')
+  async getLeaveRequestsForDirector(
+    @Param('directorId') directorId: string,
     @Query() query: GetLeaveRequestListDto,
   ) {
-    return this.leaveRequestsService.getLeaveRequestsForManager(
-      managerId,
+    return this.leaveRequestsService.getLeaveRequestsForDirector(
+      directorId,
       query,
     );
   }

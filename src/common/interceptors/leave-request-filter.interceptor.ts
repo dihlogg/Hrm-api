@@ -16,8 +16,8 @@ export class LeaveRequestFilterInterceptor implements NestInterceptor {
     const filterParticipants = (leaveRequest: any) => {
       if (!leaveRequest?.participantsRequests) return leaveRequest;
 
-      // Nếu không phải CEO thì loại bỏ confirm
-      if (!user.roles?.includes('CEO')) {
+      // Nếu không phải CEO & Director thì loại bỏ confirm
+      if (!user.roles?.includes('Director') || !user.roles?.includes('CEO')) {
         leaveRequest.participantsRequests =
           leaveRequest.participantsRequests.filter(
             (p: any) => p.type !== 'confirmed',

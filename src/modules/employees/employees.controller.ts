@@ -120,9 +120,9 @@ export class EmployeesController {
   //get manager employees by sub unit id
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('employee:read')
-  @Get('GetManagerBySubUnit/:id')
-  async getManagerBySubUnit(@Param('id') id: string) {
-    return this.employeesService.getManagersBySubUnit(id);
+  @Get('GetDirectorBySubUnit/:id')
+  async getDirectorBySubUnit(@Param('id') id: string) {
+    return this.employeesService.getDirectorBySubUnit(id);
   }
 
   //get supervisor employees
