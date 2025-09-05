@@ -18,6 +18,7 @@ import { GetLeaveRequestListDto } from './dto/get-leave-request-list.dto';
 import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
 import { LeaveRequestParticipants } from './leave-request-inform/entities/leave-request-inform.entity';
 import { LeaveBalanceDto } from './dto/leave-balance.dto';
+import { UpdateLeaveRequestStatusDto } from './dto/update-leave-request-status.dto';
 
 @Injectable()
 export class LeaveRequestsService {
@@ -125,8 +126,9 @@ export class LeaveRequestsService {
 
   async updateLeaveRequestStatus(
     id: string,
-    statusCode: string,
+    dto: UpdateLeaveRequestStatusDto,
   ): Promise<boolean> {
+    const { statusCode, note } = dto;
     const status = await this.leaveStatusRepo.findOne({
       where: { statusCode },
     });
@@ -149,7 +151,15 @@ export class LeaveRequestsService {
       );
     }
 
-    await this.repo.update(id, { leaveStatusId: status.id });
+    if (statusCode === 'PENDING' && (!note || note.trim() === '')) {
+      throw new BadRequestException(
+        'Note is required when setting status to PENDING',
+      );
+    }
+    await this.repo.update(id, {
+      leaveStatusId: status.id,
+      note: note ? note : undefined,
+    });
 
     // 4. Insert participants log flow stt(approve, confirm, inform, reject)
     if (statusCode === 'CONFIRMED') {
@@ -163,7 +173,7 @@ export class LeaveRequestsService {
     if (statusCode === 'PENDING') {
       await this.participantsRepo.save({
         leaveRequestId: leaveRequest.id,
-        employeeId: leaveRequest.expectedConfirmId, // PM confirm (expected)
+        employeeId: leaveRequest.expectedConfirmId, // PM pending (expected)
         type: 'pending',
       });
     }
@@ -312,8 +322,10 @@ export class LeaveRequestsService {
     let query = this.buildBaseQuery()
       .leftJoinAndSelect('employee.supervisor', 'manager')
       .leftJoinAndSelect('manager.supervisor', 'director')
-      .where('director.id = :directorId', { directorId })
-      .orWhere('employee.supervisor = :directorId', { directorId });
+      .where(
+        '(director.id = :directorId OR employee.supervisor = :directorId)',
+        { directorId },
+      );
 
     query = this.applyFilters(query, dto);
     query = this.applySorting(query, dto);
