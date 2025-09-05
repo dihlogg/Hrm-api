@@ -21,6 +21,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { Permissions } from 'src/common/decorators/permissions.decorator';
 import { LeaveRequestFilterInterceptor } from 'src/common/interceptors/leave-request-filter.interceptor';
+import { UpdateLeaveRequestStatusDto } from './dto/update-leave-request-status.dto';
 
 @ApiBearerAuth()
 @UseInterceptors(LeaveRequestFilterInterceptor)
@@ -145,11 +146,11 @@ export class LeaveRequestsController {
   //update leave request status
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('leave-request:update')
-  @Patch('PatchLeaveRequestStatus/:id/status/:statusCode')
+  @Patch('PatchLeaveRequestStatus/:id')
   async updateLeaveRequestStatus(
     @Param('id') id: string,
-    @Param('statusCode') statusCode: string,
+    @Body() dto: UpdateLeaveRequestStatusDto
   ) {
-    return this.leaveRequestsService.updateLeaveRequestStatus(id, statusCode);
+    return this.leaveRequestsService.updateLeaveRequestStatus(id, dto);
   }
 }

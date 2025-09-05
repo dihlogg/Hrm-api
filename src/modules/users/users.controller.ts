@@ -80,6 +80,6 @@ export class UsersController {
   @Permissions('user:read')
   @Get('GetUserInfor')
   getMe(@Req() req) {
-    return { userId: req.user.userId, username: req.user.userName };
+    return { userId: req.user.userId, username: req.user.userName, roles: req.user.roles };
   }
 }
