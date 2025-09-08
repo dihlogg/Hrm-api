@@ -8,6 +8,7 @@ import {
   Put,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -17,6 +18,7 @@ import { User } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { PermissionsGuard } from 'src/common/guards/permissions.guard';
 import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { GetUserListDto } from './dto/get-user-list.dto';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -80,6 +82,18 @@ export class UsersController {
   @Permissions('user:read')
   @Get('GetUserInfor')
   getMe(@Req() req) {
-    return { userId: req.user.userId, username: req.user.userName, roles: req.user.roles };
+    return {
+      userId: req.user.userId,
+      username: req.user.userName,
+      roles: req.user.roles,
+    };
+  }
+
+  //sorted and paginated user list
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user:read')
+  @Get('GetUserList')
+  async getUserList(@Query() query: GetUserListDto) {
+    return this.usersService.getUserList(query);
   }
 }

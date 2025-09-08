@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserStatus } from './user-status/entities/user-status.entity';
 import * as bcrypt from 'bcrypt';
+import { GetUserListDto } from './dto/get-user-list.dto';
+import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
 
 @Injectable()
 export class UsersService {
@@ -96,5 +98,81 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
     return true;
+  }
+  async getUserList(dto: GetUserListDto) {
+    const { page = 1, pageSize = 10 } = dto;
+
+    let query = this.repo
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userStatus', 'userStatus')
+      .leftJoinAndSelect('user.employee', 'employee')
+      .leftJoinAndSelect('user.userRole', 'userRole')
+      .leftJoinAndSelect('userRole.role', 'role');
+
+    query = this.applyFilters(query, dto);
+    query = this.applySorting(query, dto);
+
+    return paginateAndFormat(query, {
+      page: Number(page),
+      pageSize: Number(pageSize),
+      useQueryBuilder: true,
+      queryBuilder: query,
+    });
+  }
+
+  private applyFilters(query: SelectQueryBuilder<User>, dto: GetUserListDto) {
+    const {
+      userName,
+      firstName,
+      lastName,
+      employeeName,
+      userStatusId,
+      roleId,
+    } = dto;
+    if (userName) {
+      query.andWhere('user.userName ILIKE :userName', {
+        userName: `%${userName}%`,
+      });
+    }
+    if (firstName) {
+      query.andWhere('employee.firstName ILIKE :firstName', {
+        firstName: `%${firstName}%`,
+      });
+    }
+    if (lastName) {
+      query.andWhere('employee.lastName ILIKE :lastName', {
+        lastName: `%${lastName}%`,
+      });
+    }
+    if (employeeName) {
+      query.andWhere(
+        `("employee"."lastName" || ' ' || "employee"."firstName") ILIKE :employeeName`,
+        { employeeName: `%${employeeName}%` },
+      );
+    }
+    if (userStatusId) {
+      query.andWhere('user.userStatusId = :userStatusId', { userStatusId });
+    }
+    if (roleId) {
+      query.andWhere('userRole.roleId = :roleId', { roleId });
+    }
+    return query;
+  }
+
+  private applySorting(query: SelectQueryBuilder<User>, dto: GetUserListDto) {
+    const sortFieldMap = {
+      userName: 'user.userName',
+      firstName: 'employee.firstName',
+      lastName: 'employee.lastName',
+      userStatus: 'userStatus.name',
+      role: 'role.name',
+    };
+    if (!dto.sortBy || !dto.sortOrder) {
+      return query.orderBy('user.userName', 'DESC');
+    }
+    const sortField = sortFieldMap[dto.sortBy];
+    const sortOrder = dto.sortOrder;
+
+    return query.orderBy(sortField, sortOrder);
   }
 }
