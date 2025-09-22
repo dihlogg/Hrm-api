@@ -4,10 +4,10 @@ import { PaginationDto } from 'src/common/utils/pagination/pagination.dto';
 
 export class GetLeaveRequestListDto extends PaginationDto {
   @ApiPropertyOptional({
-    enum: ['leaveStatus', 'leaveRequestType'],
+    enum: ['leaveStatus', 'leaveRequestType', 'employee'],
   })
   @IsOptional()
-  @IsIn(['leaveStatus', 'leaveRequestType'])
+  @IsIn(['leaveStatus', 'leaveRequestType', 'employee'])
   sortBy?: string;
 
   @ApiPropertyOptional({ enum: ['ASC', 'DESC'] })

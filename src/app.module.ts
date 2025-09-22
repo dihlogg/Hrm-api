@@ -23,6 +23,7 @@ import { PartialDayModule } from './modules/leave-requests/partial-day/partial-d
 import { LeaveRequestInformModule } from './modules/leave-requests/leave-request-inform/leave-request-inform.module';
 import { LeaveRequestTypeModule } from './modules/leave-requests/leave-request-type/leave-request-type.module';
 import { LeavePolicyModule } from './modules/leave-requests/leave-policy/leave-policy.module';
+import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 
 
 @Module({
@@ -58,6 +59,7 @@ import { LeavePolicyModule } from './modules/leave-requests/leave-policy/leave-p
     LeaveRequestInformModule,
     LeaveRequestTypeModule,
     LeavePolicyModule,
+    RabbitMQModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -84,11 +84,18 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<boolean> {
-    await this.repo.update(id, updateUserDto);
-    const updatedUser = await this.repo.findOne({ where: { id } });
-    if (!updatedUser) {
+    const user = await this.repo.findOne({ where: { id } });
+    if (!user) {
       throw new NotFoundException('User not found');
     }
+
+    if (updateUserDto.password) {
+      const salt = await bcrypt.genSalt();
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
+    }
+    Object.assign(user, updateUserDto);
+    await this.repo.save(user);
+
     return true;
   }
 
