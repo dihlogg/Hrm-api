@@ -62,7 +62,7 @@ export class UsersController {
   //update user
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('user:update')
-  @Put('PostUser/:id')
+  @Put('PutUser/:id')
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,

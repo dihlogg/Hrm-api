@@ -38,6 +38,9 @@ export class CreateEmployeeDto {
   @ApiProperty()
   subUnitId: string;
 
+  @ApiProperty()
+  parentId: string;
+
   @ApiPropertyOptional({ default: false })
   createLogin?: boolean;
 

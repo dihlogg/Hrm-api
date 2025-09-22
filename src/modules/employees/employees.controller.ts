@@ -132,4 +132,12 @@ export class EmployeesController {
   async getSupervisorEmployee(@Param('id') id: string) {
     return this.employeesService.getSupervisorEmployee(id);
   }
+
+  //get parent employees(manager, director, ceo)
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('employee:read')
+  @Get('GetParentEmployee')
+  async getParentEmployee() {
+    return this.employeesService.getParentEmployee();
+  }
 }

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -19,6 +20,8 @@ import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
 import { LeaveRequestParticipants } from './leave-request-inform/entities/leave-request-inform.entity';
 import { LeaveBalanceDto } from './dto/leave-balance.dto';
 import { UpdateLeaveRequestStatusDto } from './dto/update-leave-request-status.dto';
+import { ClientProxy } from '@nestjs/microservices';
+import { RabbitPublisherService } from 'src/rabbitmq/rabbit-publisher.service';
 
 @Injectable()
 export class LeaveRequestsService {
@@ -37,6 +40,7 @@ export class LeaveRequestsService {
     private readonly employeeRepo: Repository<Employee>,
     @InjectRepository(LeaveRequestParticipants)
     private readonly participantsRepo: Repository<LeaveRequestParticipants>,
+    private readonly rabbitPublisher: RabbitPublisherService,
   ) {}
 
   async findAll(): Promise<LeaveRequest[]> {
@@ -107,7 +111,11 @@ export class LeaveRequestsService {
         expectedInformToId,
         expectedConfirmId,
       });
-
+      // push event rabbitMQ
+      await this.rabbitPublisher.emitWithRetry(
+        'LEAVE_REQUEST_CREATED',
+        leaveRequest,
+      );
       return await manager.save(leaveRequest);
     });
   }
