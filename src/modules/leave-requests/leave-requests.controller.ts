@@ -10,6 +10,7 @@ import {
   UseGuards,
   Patch,
   UseInterceptors,
+  Req,
 } from '@nestjs/common';
 import { LeaveRequestsService } from './leave-requests.service';
 import { CreateLeaveRequestDto } from './dto/create-leave-request.dto';
@@ -149,8 +150,10 @@ export class LeaveRequestsController {
   @Patch('PatchLeaveRequestStatus/:id')
   async updateLeaveRequestStatus(
     @Param('id') id: string,
-    @Body() dto: UpdateLeaveRequestStatusDto
+    @Body() dto: UpdateLeaveRequestStatusDto,
+    @Req() req,
   ) {
-    return this.leaveRequestsService.updateLeaveRequestStatus(id, dto);
+    const actorId = req.user.userId;
+    return this.leaveRequestsService.updateLeaveRequestStatus(id, dto, actorId);
   }
 }

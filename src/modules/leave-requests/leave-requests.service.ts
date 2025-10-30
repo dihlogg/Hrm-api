@@ -1,6 +1,6 @@
 import {
   BadRequestException,
-  Inject,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -20,7 +20,6 @@ import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
 import { LeaveRequestParticipants } from './leave-request-inform/entities/leave-request-inform.entity';
 import { LeaveBalanceDto } from './dto/leave-balance.dto';
 import { UpdateLeaveRequestStatusDto } from './dto/update-leave-request-status.dto';
-import { ClientProxy } from '@nestjs/microservices';
 import { RabbitPublisherService } from 'src/rabbitmq/rabbit-publisher.service';
 
 @Injectable()
@@ -112,11 +111,18 @@ export class LeaveRequestsService {
         expectedConfirmId,
       });
       // push event rabbitMQ
-      await this.rabbitPublisher.emitWithRetry(
-        'LEAVE_REQUEST_CREATED',
-        leaveRequest,
-      );
-      return await manager.save(leaveRequest);
+      const savedLeaveRequest = await manager.save(leaveRequest);
+
+      await this.rabbitPublisher.emitWithRetry('LEAVE_REQUEST_CREATED', {
+        leaveRequest: savedLeaveRequest,
+        actor: {
+          id: employee.id,
+          firstName: employee.firstName,
+          lastName: employee.lastName,
+        },
+      });
+
+      return savedLeaveRequest;
     });
   }
 
@@ -124,17 +130,46 @@ export class LeaveRequestsService {
     id: string,
     updateLeaveRequestDto: UpdateLeaveRequestDto,
   ): Promise<boolean> {
-    await this.repo.update(id, updateLeaveRequestDto);
-    const updateLeaveRequest = await this.repo.findOne({ where: { id } });
-    if (!updateLeaveRequest) {
-      throw new NotFoundException('Leave Request not found');
-    }
-    return true;
+    return await this.repo.manager.transaction(async (manager) => {
+      // check leave request
+      const existingLeaveRequest = await manager.findOne(LeaveRequest, {
+        where: { id },
+        relations: ['employee', 'leaveStatus'],
+      });
+
+      if (!existingLeaveRequest) {
+        throw new NotFoundException('Leave Request not found');
+      }
+
+      await manager.update(LeaveRequest, id, updateLeaveRequestDto);
+
+      const updatedLeaveRequest = await manager.findOne(LeaveRequest, {
+        where: { id },
+        relations: ['employee', 'leaveStatus'],
+      });
+
+      if (!updatedLeaveRequest) {
+        throw new NotFoundException('Updated Leave Request not found');
+      }
+
+      // push sang rabbitMQ
+      await this.rabbitPublisher.emitWithRetry('LEAVE_REQUEST_UPDATED', {
+        leaveRequest: updatedLeaveRequest,
+        actor: {
+          id: updatedLeaveRequest.employee.id,
+          firstName: updatedLeaveRequest.employee.firstName,
+          lastName: updatedLeaveRequest.employee.lastName,
+        },
+      });
+
+      return true;
+    });
   }
 
   async updateLeaveRequestStatus(
     id: string,
     dto: UpdateLeaveRequestStatusDto,
+    userId: string,
   ): Promise<boolean> {
     const { statusCode, note } = dto;
     const status = await this.leaveStatusRepo.findOne({
@@ -164,12 +199,34 @@ export class LeaveRequestsService {
         'Note is required when setting status to PENDING',
       );
     }
+    // get employee actor
+    const actorEmployee = await this.employeeRepo.findOne({
+      where: { userId },
+    });
+    if (!actorEmployee) {
+      throw new NotFoundException('Employee not found for this user');
+    }
+    const actorEmployeeId = await this.getActorEmployeeId(
+      statusCode,
+      actorEmployee,
+      leaveRequest,
+    );
+
+    const actor = await findEntityOrFail(
+      this.employeeRepo,
+      actorEmployeeId,
+      'Actor Employee',
+    );
+    // get previous status
+    const previousStatusEntity = await this.leaveStatusRepo.findOne({
+      where: { id: leaveRequest.leaveStatusId },
+    });
     await this.repo.update(id, {
       leaveStatusId: status.id,
       note: note ? note : undefined,
     });
 
-    // 4. Insert participants log flow stt(approve, confirm, inform, reject)
+    // insert participants log flow stt(approve, confirm, inform, reject)
     if (statusCode === 'CONFIRMED') {
       await this.participantsRepo.save({
         leaveRequestId: leaveRequest.id,
@@ -206,12 +263,89 @@ export class LeaveRequestsService {
       await this.participantsRepo.save({
         leaveRequestId: leaveRequest.id,
         employeeId:
-          leaveRequest.expectedConfirmId ?? leaveRequest.expectedApproverId, // Nếu reject ở bước PM thì confirmId, nếu reject ở bước Director thì approverId
+          leaveRequest.expectedConfirmId ?? leaveRequest.expectedApproverId, // Nếu reject ở Manager thì confirmId, nếu reject ở Director thì approverId
         type: 'reject',
       });
     }
 
+    const updatedLeaveRequest = await this.repo.findOne({
+      where: { id },
+      relations: ['employee', 'leaveStatus'],
+    });
+
+    await this.rabbitPublisher.emitWithRetry('LEAVE_REQUEST_STATUS_UPDATED', {
+      leaveRequest: updatedLeaveRequest,
+      actor: {
+        id: actor.id,
+        firstName: actor.firstName,
+        lastName: actor.lastName,
+      },
+      previousStatus: previousStatusEntity?.name,
+      newStatus: status.name,
+    });
+
     return true;
+  }
+
+  private async getActorEmployeeId(
+    statusCode: string,
+    actorEmployee: Employee,
+    leaveRequest: LeaveRequest,
+  ): Promise<string> {
+    if (['CONFIRMED', 'PENDING'].includes(statusCode)) {
+      if (actorEmployee.id !== leaveRequest.expectedConfirmId) {
+        throw new ForbiddenException(
+          'Only the expected confirmer can perform this action',
+        );
+      }
+      return leaveRequest.expectedConfirmId;
+    }
+
+    if (statusCode === 'APPROVED') {
+      if (actorEmployee.id !== leaveRequest.expectedApproverId) {
+        throw new ForbiddenException(
+          'Only the expected approver can perform this action',
+        );
+      }
+      return leaveRequest.expectedApproverId;
+    }
+
+    if (statusCode === 'REJECTED') {
+      const currentStatus = await this.leaveStatusRepo.findOne({
+        where: { id: leaveRequest.leaveStatusId },
+      });
+
+      if (currentStatus?.statusCode === 'SUBMITTED') {
+        if (actorEmployee.id !== leaveRequest.expectedConfirmId) {
+          throw new ForbiddenException(
+            'Only the manager can reject at this stage',
+          );
+        }
+        return leaveRequest.expectedConfirmId;
+      }
+
+      if (currentStatus?.statusCode === 'PENDING') {
+        if (actorEmployee.id !== leaveRequest.expectedConfirmId) {
+          throw new ForbiddenException(
+            'Only the manager can reject at this stage (PENDING)',
+          );
+        }
+        return leaveRequest.expectedConfirmId;
+      }
+
+      if (currentStatus?.statusCode === 'CONFIRMED') {
+        if (actorEmployee.id !== leaveRequest.expectedApproverId) {
+          throw new ForbiddenException(
+            'Only the director can reject at this stage',
+          );
+        }
+        return leaveRequest.expectedApproverId;
+      }
+
+      throw new BadRequestException('Cannot reject from current status');
+    }
+
+    return actorEmployee.id; // fallback
   }
 
   async delete(id: string): Promise<boolean> {

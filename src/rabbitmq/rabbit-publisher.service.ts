@@ -22,6 +22,7 @@ export class RabbitPublisherService {
             `[${new Date().toISOString()}] Attempting to publish message:`,
             {
               pattern,
+              data,
               attempt: attempt + 1,
               queue: 'hrm.notifications',
             },
