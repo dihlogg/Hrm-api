@@ -29,7 +29,7 @@ import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 @Module({
   imports: [
     AuthModule,
-    ConfigModule.forRoot({ isGlobal: true }), // Load .env
+    ConfigModule.forRoot({envFilePath: '.env', isGlobal: true }), // Load .env
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
