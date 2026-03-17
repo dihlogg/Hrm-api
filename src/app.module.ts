@@ -23,13 +23,12 @@ import { PartialDayModule } from './modules/leave-requests/partial-day/partial-d
 import { LeaveRequestInformModule } from './modules/leave-requests/leave-request-inform/leave-request-inform.module';
 import { LeaveRequestTypeModule } from './modules/leave-requests/leave-request-type/leave-request-type.module';
 import { LeavePolicyModule } from './modules/leave-requests/leave-policy/leave-policy.module';
-import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
-
+import { KafkaModule } from './kafka/kafka.module';
 
 @Module({
   imports: [
     AuthModule,
-    ConfigModule.forRoot({envFilePath: '.env', isGlobal: true }), // Load .env
+    ConfigModule.forRoot({ isGlobal: true }), // Load .env
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -59,7 +58,7 @@ import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
     LeaveRequestInformModule,
     LeaveRequestTypeModule,
     LeavePolicyModule,
-    RabbitMQModule
+    KafkaModule
   ],
   controllers: [AppController],
   providers: [AppService],
