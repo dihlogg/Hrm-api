@@ -25,6 +25,14 @@ export class AuthService {
     return passwordValid ? user : null;
   }
 
+  async validateToken(accessToken: string) {
+    const token = await this.jwtService.verifyAsync(accessToken, {secret: process.env.JWT_SECRET});
+    if(!token) {
+      throw new UnauthorizedException('Invalid token');
+    }
+    return token;
+  }
+
   async login(user: any) {
     const roles = user.userRole?.map((ur) => ur.role?.name) || [];
     const permissions = await this.permissionService.getPermissionsByUserId(

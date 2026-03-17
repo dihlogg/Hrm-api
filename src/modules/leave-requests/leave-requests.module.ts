@@ -12,7 +12,7 @@ import { LeaveRequestTypeModule } from './leave-request-type/leave-request-type.
 import { AuthModule } from '../auth/auth.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { LeavePolicyModule } from './leave-policy/leave-policy.module';
-import { RabbitMQModule } from 'src/rabbitmq/rabbitmq.module';
+import { KafkaModule } from 'src/kafka/kafka.module';
 
 @Module({
   imports: [
@@ -26,7 +26,7 @@ import { RabbitMQModule } from 'src/rabbitmq/rabbitmq.module';
     AuthModule,
     PermissionsModule,
     LeavePolicyModule,
-    RabbitMQModule
+    KafkaModule
   ],
   controllers: [LeaveRequestsController],
   providers: [LeaveRequestsService],

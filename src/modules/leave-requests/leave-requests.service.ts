@@ -20,7 +20,8 @@ import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
 import { LeaveRequestParticipants } from './leave-request-inform/entities/leave-request-inform.entity';
 import { LeaveBalanceDto } from './dto/leave-balance.dto';
 import { UpdateLeaveRequestStatusDto } from './dto/update-leave-request-status.dto';
-import { RabbitPublisherService } from 'src/rabbitmq/rabbit-publisher.service';
+import { ProducerService } from 'src/kafka/producers/producer.service';
+import { KAFKA_TOPICS } from 'src/kafka/config/kafka-topics.constant';
 
 @Injectable()
 export class LeaveRequestsService {
@@ -39,7 +40,7 @@ export class LeaveRequestsService {
     private readonly employeeRepo: Repository<Employee>,
     @InjectRepository(LeaveRequestParticipants)
     private readonly participantsRepo: Repository<LeaveRequestParticipants>,
-    private readonly rabbitPublisher: RabbitPublisherService,
+    private readonly kafkaProducer: ProducerService
   ) {}
 
   async findAll(): Promise<LeaveRequest[]> {
@@ -110,16 +111,19 @@ export class LeaveRequestsService {
         expectedInformToId,
         expectedConfirmId,
       });
-      // push event rabbitMQ
+      // push event kafka
       const savedLeaveRequest = await manager.save(leaveRequest);
 
-      await this.rabbitPublisher.emitWithRetry('LEAVE_REQUEST_CREATED', {
-        leaveRequest: savedLeaveRequest,
-        actor: {
-          id: employee.id,
-          firstName: employee.firstName,
-          lastName: employee.lastName,
-        },
+      await this.kafkaProducer.produce(KAFKA_TOPICS.LEAVE_REQUEST_CREATED, {
+        key: savedLeaveRequest.id,
+        value: JSON.stringify({
+          leaveRequest: savedLeaveRequest,
+          actor: {
+            id: employee.id,
+            firstName: employee.firstName,
+            lastName: employee.lastName,
+          },
+        }),
       });
 
       return savedLeaveRequest;
@@ -153,13 +157,16 @@ export class LeaveRequestsService {
       }
 
       // push sang rabbitMQ
-      await this.rabbitPublisher.emitWithRetry('LEAVE_REQUEST_UPDATED', {
-        leaveRequest: updatedLeaveRequest,
-        actor: {
-          id: updatedLeaveRequest.employee.id,
-          firstName: updatedLeaveRequest.employee.firstName,
-          lastName: updatedLeaveRequest.employee.lastName,
-        },
+      await this.kafkaProducer.produce(KAFKA_TOPICS.LEAVE_REQUEST_UPDATED, {
+        key: updatedLeaveRequest.id,
+        value: JSON.stringify({
+          leaveRequest: updatedLeaveRequest,
+          actor: {
+            id: updatedLeaveRequest.employee.id,
+            firstName: updatedLeaveRequest.employee.firstName,
+            lastName: updatedLeaveRequest.employee.lastName,
+          },
+        })
       });
 
       return true;
@@ -273,15 +280,22 @@ export class LeaveRequestsService {
       relations: ['employee', 'leaveStatus'],
     });
 
-    await this.rabbitPublisher.emitWithRetry('LEAVE_REQUEST_STATUS_UPDATED', {
-      leaveRequest: updatedLeaveRequest,
-      actor: {
-        id: actor.id,
-        firstName: actor.firstName,
-        lastName: actor.lastName,
-      },
-      previousStatus: previousStatusEntity?.name,
-      newStatus: status.name,
+    if (!updatedLeaveRequest) {
+      throw new NotFoundException('Updated Leave Request not found');
+    }
+
+    await this.kafkaProducer.produce(KAFKA_TOPICS.LEAVE_REQUEST_STATUS_UPDATED, {
+      key: updatedLeaveRequest.id,
+      value: JSON.stringify({
+        leaveRequest: updatedLeaveRequest,
+        actor: {
+          id: actor.id,
+          firstName: actor.firstName,
+          lastName: actor.lastName,
+        },
+        previousStatus: previousStatusEntity?.name,
+        newStatus: status.name,
+      })
     });
 
     return true;
