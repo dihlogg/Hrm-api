@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { forwardRef, Global, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
@@ -8,11 +8,14 @@ import { PermissionsModule } from '../permissions/permissions.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from '../users/users.module';
 import { RedisModule } from 'src/redis/redis.module';
+import { EmployeesModule } from '../employees/employees.module';
 
+@Global()
 @Module({
   imports: [
     forwardRef(() => UsersModule),
     forwardRef(() => PermissionsModule),
+    forwardRef(() => EmployeesModule),
     ConfigModule,
     PassportModule,
     RedisModule,

@@ -26,16 +26,16 @@ async function bootstrap() {
     transport: Transport.KAFKA,
     options: {
       client: {
-        clientId: 'hrm-core-server',
+        clientId: 'hrm-core',
         brokers: [configService.get<string>('KAFKA_BROKER')!],
       },
       consumer: {
-        groupId: 'hrm-core-group',
+        groupId: 'hrm-group',
       },
     },
   });
 
-  // await app.startAllMicroservices();
+  await app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();
