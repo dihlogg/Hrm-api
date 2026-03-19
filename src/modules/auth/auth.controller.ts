@@ -37,6 +37,7 @@ export class AuthController {
       userId: userId,
       employeeId: employee.id,
       fullName: `${employee.lastName} ${employee.firstName}`.trim(),
+      avatarUrl: employee.imageUrl,
       roles: req.user.roles,
     };
   }
