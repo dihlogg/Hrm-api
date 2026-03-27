@@ -3,14 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
 } from '@nestjs/common';
 import { RolePermissionService } from './role-permission.service';
 import { CreateRolePermissionDto } from './dto/create-role-permission.dto';
-import { UpdateRolePermissionDto } from './dto/update-role-permission.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { RolePermission } from './entities/role-permission.entity';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -50,5 +48,19 @@ export class RolePermissionController {
   @Delete('DeletePermissionFromRole/:id')
   async deletePermissionFromRole(@Param('id') id: string): Promise<boolean> {
     return this.rolePermissionService.delete(id);
+  }
+
+  //delete permission fr role by roleId and permissionId
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('role-permission:delete')
+  @Delete('DeleteByRoleAndPermission/:roleId/:permissionId')
+  async deleteByRoleAndPermission(
+    @Param('roleId') roleId: string,
+    @Param('permissionId') permissionId: string,
+  ): Promise<boolean> {
+    return this.rolePermissionService.deleteByRoleAndPermission(
+      roleId,
+      permissionId,
+    );
   }
 }

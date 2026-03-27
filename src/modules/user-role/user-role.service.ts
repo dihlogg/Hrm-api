@@ -24,4 +24,12 @@ export class UserRoleService {
     }
     return true
   }
+
+  async deleteRoleFromUser(userId: string, roleId: string): Promise<boolean> {
+    const result = await this.repo.delete({ userId, roleId });
+    if (result.affected === 0) {
+      throw new NotFoundException('This user role mapping not found');
+    }
+    return true;
+  }
 }

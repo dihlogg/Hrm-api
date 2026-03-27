@@ -50,4 +50,12 @@ export class RolePermissionService {
     }
     return true;
   }
+  
+  async deleteByRoleAndPermission(roleId: string, permissionId: string): Promise<boolean> {
+    const result = await this.repo.delete({ roleId, permissionId });
+    if (result.affected === 0) {
+      throw new NotFoundException('This role permission mapping not found');
+    }
+    return true;
+  }
 }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, Brackets } from 'typeorm';
 import { Permission } from './entities/permission.entity';
 import { UserRole } from '../user-role/entities/user-role.entity';
 import { CreatePermissionDto } from './dto/create-permission.dto';
@@ -77,23 +77,26 @@ export class PermissionsService {
     });
   }
 
-  async getPermissionsByRoleId(roleId: string): Promise<CreatePermissionDto[]> {
+  async getPermissionsByRoleId(roleId: string) {
     const rolePermissions = await this.rolePermissionRepo.find({
       where: { roleId },
       relations: ['permission'],
     });
 
     return rolePermissions.map((pr) => {
-      const dto = new CreatePermissionDto();
-      dto.name = pr.permission.name;
-      dto.description = pr.permission.description;
-      dto.displayOrder = pr.permission.displayOrder;
-      dto.code = pr.permission.code;
-      return dto;
+      return {
+        id: pr.permission.id,
+        name: pr.permission.name,
+        description: pr.permission.description,
+        displayOrder: pr.permission.displayOrder,
+        code: pr.permission.code,
+      };
     });
   }
 
-  async getUsersByPermissionId(permissionId: string): Promise<UserPermissionDto[]> {
+  async getUsersByPermissionId(
+    permissionId: string,
+  ): Promise<UserPermissionDto[]> {
     const userPermissions = await this.userPermissionRepo.find({
       where: { permissionId },
       relations: ['user'],
@@ -110,37 +113,65 @@ export class PermissionsService {
   }
 
   // Dynamic Authorization
+  // async getPermissionsByUserId(userId: string): Promise<string[]> {
+  //   // 1. User permissions
+  //   const userPermissions = await this.userPermissionRepo.find({
+  //     where: { userId: userId },
+  //     relations: ['permission'],
+  //   });
+
+  //   const granted = userPermissions
+  //     .filter((up) => up.isGranted)
+  //     .map((up) => up.permission?.code);
+
+  //   const revoked = userPermissions
+  //     .filter((up) => up.isGranted === false)
+  //     .map((up) => up.permission?.code);
+
+  //   const userRoles = await this.userRoleRepo.find({
+  //     where: { userId: userId },
+  //   });
+  //   const roleIds = userRoles.map((ur) => ur.roleId);
+  //   if (roleIds.length === 0) {
+  //     return granted;
+  //   }
+  //   const rolePermissions = await this.rolePermissionRepo.find({
+  //     where: { roleId: In(roleIds) },
+  //     relations: ['permission'],
+  //   });
+  //   const roleCodes = rolePermissions.map((rp) => rp.permission?.code);
+
+  //   const allPermissions = new Set([...roleCodes, ...granted]);
+  //   revoked.forEach((code) => allPermissions.delete(code));
+
+  //   return Array.from(allPermissions);
+  // }
   async getPermissionsByUserId(userId: string): Promise<string[]> {
-    // 1. User permissions
-    const userPermissions = await this.userPermissionRepo.find({
-      where: { userId: userId },
-      relations: ['permission'],
-    });
+    const result = await this.permissionRepo
+      .createQueryBuilder('permission')
+      .leftJoin('permission.userPermission', 'up', 'up.userId = :userId', {
+        userId,
+      })
+      .leftJoin('permission.rolePermission', 'rp')
+      .leftJoin('rp.role', 'role')
+      .leftJoin('role.userRole', 'ur', 'ur.userId = :userId', { userId })
+      .where('up.isGranted = :isGrantedTrue', { isGrantedTrue: true })
+      .orWhere(
+        new Brackets((qb) => {
+          qb.where('ur.userId = :userId', { userId }).andWhere(
+            new Brackets((subQb) => {
+              subQb
+                .where('up.isGranted IS NULL')
+                .orWhere('up.isGranted = :isGrantedTrue', {
+                  isGrantedTrue: true,
+                });
+            }),
+          );
+        }),
+      )
+      .select('DISTINCT permission.code', 'code')
+      .getRawMany();
 
-    const granted = userPermissions
-      .filter((up) => up.isGranted)
-      .map((up) => up.permission?.code);
-
-    const revoked = userPermissions
-      .filter((up) => up.isGranted === false)
-      .map((up) => up.permission?.code);
-
-    const userRoles = await this.userRoleRepo.find({
-      where: { userId: userId },
-    });
-    const roleIds = userRoles.map((ur) => ur.roleId);
-    if (roleIds.length === 0) {
-      return granted;
-    }
-    const rolePermissions = await this.rolePermissionRepo.find({
-      where: { roleId: In(roleIds) },
-      relations: ['permission'],
-    });
-    const roleCodes = rolePermissions.map((rp) => rp.permission?.code);
-
-    const allPermissions = new Set([...roleCodes, ...granted]);
-    revoked.forEach((code) => allPermissions.delete(code));
-
-    return Array.from(allPermissions);
+    return result.map((row) => row.code);
   }
 }
