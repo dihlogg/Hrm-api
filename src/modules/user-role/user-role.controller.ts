@@ -46,4 +46,14 @@ export class UserRoleController {
   ): Promise<boolean> {
     return await this.userRoleService.revokeRoleFromUser(id, updateUserRoleDto);
   }
+
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user-role:revoke')
+  @Delete('DeleteRoleFromUser/:userId/:roleId')
+  async deleteRoleFromUser(
+    @Param('userId') userId: string,
+    @Param('roleId') roleId: string,
+  ): Promise<boolean> {
+    return await this.userRoleService.deleteRoleFromUser(userId, roleId);
+  }
 }
