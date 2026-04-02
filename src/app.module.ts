@@ -24,6 +24,7 @@ import { LeaveRequestInformModule } from './modules/leave-requests/leave-request
 import { LeaveRequestTypeModule } from './modules/leave-requests/leave-request-type/leave-request-type.module';
 import { LeavePolicyModule } from './modules/leave-requests/leave-policy/leave-policy.module';
 import { KafkaModule } from './kafka/kafka.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { KafkaModule } from './kafka/kafka.module';
     LeaveRequestInformModule,
     LeaveRequestTypeModule,
     LeavePolicyModule,
+    CloudinaryModule,
     KafkaModule
   ],
   controllers: [AppController],

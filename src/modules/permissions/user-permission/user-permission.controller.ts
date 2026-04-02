@@ -33,6 +33,16 @@ export class UserPermissionController {
     return await this.userPermissionService.findAll();
   }
 
+  //get user permissions by user id
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user-permission:read')
+  @Get('GetPermissionsByUserId/:userId')
+  async getPermissionsByUserId(
+    @Param('userId') userId: string,
+  ): Promise<UserPermission[]> {
+    return await this.userPermissionService.findByUserId(userId);
+  }
+
   //assign permission to user
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('user-permission:assign')
@@ -65,5 +75,19 @@ export class UserPermissionController {
   @Delete('DeletePermissionFromUser/:id')
   async deletePermissionFromUser(@Param('id') id: string): Promise<boolean> {
     return this.userPermissionService.deletePermissionFromUser(id);
+  }
+
+  //delete by user id and permission id
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('user-permission:delete')
+  @Delete('DeleteByUserAndPermission/:userId/:permissionId')
+  async deleteByUserAndPermission(
+    @Param('userId') userId: string,
+    @Param('permissionId') permissionId: string,
+  ): Promise<boolean> {
+    return this.userPermissionService.deleteByUserAndPermission(
+      userId,
+      permissionId,
+    );
   }
 }
