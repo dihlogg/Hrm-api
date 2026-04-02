@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary } from 'cloudinary';
 
 @Injectable()
 export class CloudinaryService {
+  private readonly logger = new Logger(CloudinaryService.name);
   constructor(private configService: ConfigService) {
     cloudinary.config({
       cloud_name: this.configService.get<string>('CLOUDINARY_CLOUD_NAME'),
@@ -32,5 +33,32 @@ export class CloudinaryService {
       signature,
       apiKey,
     };
+  }
+  private extractPublicId(url: string): string | null {
+    try {
+      const parts = url.split('/upload/');
+      if (parts.length !== 2) return null;
+
+      const pathWithoutVersion = parts[1].replace(/^v\d+\//, '');
+      const lastDotIndex = pathWithoutVersion.lastIndexOf('.');
+      if (lastDotIndex === -1) return pathWithoutVersion;
+
+      return pathWithoutVersion.substring(0, lastDotIndex);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async deleteImageByUrl(url: string): Promise<void> {
+    if (!url) return;
+    const publicId = this.extractPublicId(url);
+    if (publicId) {
+      try {
+        await cloudinary.uploader.destroy(publicId);
+        this.logger.log(`Deleted avatar from Cloudinary: ${publicId}`);
+      } catch (error) {
+        this.logger.error(`Failed to delete avatar: ${publicId}`, error);
+      }
+    }
   }
 }

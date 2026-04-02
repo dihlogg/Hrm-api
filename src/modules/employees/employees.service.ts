@@ -14,6 +14,7 @@ import { GetEmployeeListDto } from './dto/get-employee-list.dto';
 import { PaginationDto } from 'src/common/utils/pagination/pagination.dto';
 import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
 import { EmployeeStatus } from './employee-status/entities/employee-status.entity';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class EmployeesService {
@@ -23,6 +24,7 @@ export class EmployeesService {
     private readonly employeeStatusRepo: Repository<EmployeeStatus>,
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async create(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
@@ -85,11 +87,26 @@ export class EmployeesService {
     id: string,
     updateEmployeeDto: UpdateEmployeeDto,
   ): Promise<boolean> {
-    await this.repo.update(id, updateEmployeeDto);
-    const updateEmployee = await this.repo.findOne({ where: { id } });
-    if (!updateEmployee) {
+    const employee = await this.repo.findOne({ where: { id } });
+    if (!employee) {
       throw new NotFoundException('Employee not found');
     }
+
+    const oldImageUrl = employee.imageUrl;
+
+    await this.repo.update(id, updateEmployeeDto);
+
+    if (
+      updateEmployeeDto.imageUrl !== undefined &&
+      updateEmployeeDto.imageUrl !== oldImageUrl &&
+      oldImageUrl
+    ) {
+      // Xóa ảnh cũ trên Cloudinary (chạy nền)
+      this.cloudinaryService.deleteImageByUrl(oldImageUrl).catch((err) => {
+        console.error('Failed to delete old avatar on Cloudinary', err);
+      });
+    }
+
     return true;
   }
 
@@ -113,10 +130,24 @@ export class EmployeesService {
   }
 
   async delete(id: string): Promise<boolean> {
+    const employee = await this.repo.findOne({ where: { id } });
+    if (!employee) {
+      throw new NotFoundException('Employee not found');
+    }
+
+    const imageUrlToDelete = employee.imageUrl;
+
     const result = await this.repo.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException('Employee not found');
     }
+
+    if (imageUrlToDelete) {
+      this.cloudinaryService.deleteImageByUrl(imageUrlToDelete).catch((err) => {
+        console.error('Failed to delete avatar on Cloudinary', err);
+      });
+    }
+
     return true;
   }
 
