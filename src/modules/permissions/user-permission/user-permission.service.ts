@@ -25,6 +25,13 @@ export class UserPermissionService {
     return userPermission;
   }
 
+  async findByUserId(userId: string): Promise<UserPermission[]> {
+    return await this.repo.find({
+      where: { userId },
+      relations: ['permission'],
+    });
+  }
+
   async assignPermissionToUser(
     createUserPermission: CreateUserPermissionDto,
   ): Promise<UserPermission> {
@@ -48,6 +55,17 @@ export class UserPermissionService {
     const result = await this.repo.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException('This user permission not found');
+    }
+    return true;
+  }
+
+  async deleteByUserAndPermission(
+    userId: string,
+    permissionId: string,
+  ): Promise<boolean> {
+    const result = await this.repo.delete({ userId, permissionId });
+    if (result.affected === 0) {
+      throw new NotFoundException('This user permission mapping not found');
     }
     return true;
   }
