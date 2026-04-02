@@ -7,9 +7,10 @@ import { JobTitleModule } from './job-title/job-title.module';
 import { SubUnitModule } from './sub-unit/sub-unit.module';
 import { UsersModule } from '../users/users.module';
 import { EmployeeStatusModule } from './employee-status/employee-status.module';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Employee]), JobTitleModule, SubUnitModule, UsersModule, EmployeeStatusModule],
+  imports: [TypeOrmModule.forFeature([Employee]), JobTitleModule, SubUnitModule, UsersModule, EmployeeStatusModule, CloudinaryModule],
   controllers: [EmployeesController],
   providers: [EmployeesService],
   exports: [TypeOrmModule, EmployeesService],
