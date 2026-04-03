@@ -11,10 +11,10 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { DataSource } from 'typeorm';
 import { GetEmployeeListDto } from './dto/get-employee-list.dto';
-import { PaginationDto } from 'src/common/utils/pagination/pagination.dto';
-import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
 import { EmployeeStatus } from './employee-status/entities/employee-status.entity';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { CloudinaryService } from '../../cloudinary/cloudinary.service';
+import { PaginationDto } from '../../common/utils/pagination/pagination.dto';
+import { paginateAndFormat } from '../../common/utils/pagination/pagination.util';
 
 @Injectable()
 export class EmployeesService {

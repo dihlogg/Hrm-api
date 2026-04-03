@@ -1,7 +1,7 @@
-import { BaseEntities } from 'src/common/entities/base.entity';
-import { Employee } from 'src/modules/employees/entities/employee.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { LeaveRequest } from '../../entities/leave-request.entity';
+import { Employee } from '../../../employees/entities/employee.entity';
+import { BaseEntities } from '../../../../common/entities/base.entity';
 
 @Entity('LeaveRequestParticipants')
 export class LeaveRequestParticipants extends BaseEntities {

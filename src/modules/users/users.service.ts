@@ -7,7 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserStatus } from './user-status/entities/user-status.entity';
 import * as bcrypt from 'bcrypt';
 import { GetUserListDto } from './dto/get-user-list.dto';
-import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
+import { paginateAndFormat } from '../../common/utils/pagination/pagination.util';
 
 @Injectable()
 export class UsersService {

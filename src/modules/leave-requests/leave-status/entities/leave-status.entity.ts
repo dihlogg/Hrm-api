@@ -1,6 +1,6 @@
-import { BaseEntities } from 'src/common/entities/base.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { LeaveRequest } from '../../entities/leave-request.entity';
+import { BaseEntities } from '../../../../common/entities/base.entity';
 
 @Entity('LeaveStatuses')
 export class LeaveStatus extends BaseEntities {

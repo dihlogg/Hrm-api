@@ -13,9 +13,9 @@ import { CreateLeaveReasonDto } from './dto/create-leave-reason.dto';
 import { UpdateLeaveReasonDto } from './dto/update-leave-reason.dto';
 import { LeaveReason } from './entities/leave-reason.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { PermissionsGuard } from 'src/common/guards/permissions.guard';
-import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../../common/guards/permissions.guard';
+import { Permissions } from '../../../common/decorators/permissions.decorator';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)

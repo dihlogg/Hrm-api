@@ -11,9 +11,9 @@ import {
 import { EmployeeStatusService } from './employee-status.service';
 import { CreateEmployeeStatusDto } from './dto/create-employee-status.dto';
 import { UpdateEmployeeStatusDto } from './dto/update-employee-status.dto';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { PermissionsGuard } from 'src/common/guards/permissions.guard';
-import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../../common/guards/permissions.guard';
+import { Permissions } from '../../../common/decorators/permissions.decorator';
 import { EmployeeStatus } from './entities/employee-status.entity';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 

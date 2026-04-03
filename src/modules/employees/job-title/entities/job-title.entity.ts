@@ -1,6 +1,6 @@
-import { BaseEntities } from 'src/common/entities/base.entity';
-import { Employee } from 'src/modules/employees/entities/employee.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
+import { Employee } from '../../entities/employee.entity';
+import { BaseEntities } from '../../../../common/entities/base.entity';
 
 @Entity('JobTitles')
 export class JobTitle extends BaseEntities {

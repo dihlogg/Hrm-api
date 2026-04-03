@@ -1,11 +1,11 @@
-import { BaseEntities } from 'src/common/entities/base.entity';
-import { Employee } from 'src/modules/employees/entities/employee.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { PartialDay } from '../partial-day/entities/partial-day.entity';
 import { LeaveStatus } from '../leave-status/entities/leave-status.entity';
 import { LeaveReason } from '../leave-reason/entities/leave-reason.entity';
 import { LeaveRequestParticipants } from '../leave-request-inform/entities/leave-request-inform.entity';
 import { LeaveRequestType } from '../leave-request-type/entities/leave-request-type.entity';
+import { BaseEntities } from '../../../common/entities/base.entity';
+import { Employee } from '../../employees/entities/employee.entity';
 
 @Entity('LeaveRequests')
 export class LeaveRequest extends BaseEntities {

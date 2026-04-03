@@ -13,15 +13,15 @@ import { LeaveStatus } from './leave-status/entities/leave-status.entity';
 import { LeaveReason } from './leave-reason/entities/leave-reason.entity';
 import { PartialDay } from './partial-day/entities/partial-day.entity';
 import { Employee } from '../employees/entities/employee.entity';
-import { findEntityOrFail } from 'src/common/utils/findEntityOrFail.util';
+import { findEntityOrFail } from '../../common/utils/findEntityOrFail.util';
 import { LeaveRequestType } from './leave-request-type/entities/leave-request-type.entity';
 import { GetLeaveRequestListDto } from './dto/get-leave-request-list.dto';
-import { paginateAndFormat } from 'src/common/utils/pagination/pagination.util';
+import { paginateAndFormat } from '../../common/utils/pagination/pagination.util';
 import { LeaveRequestParticipants } from './leave-request-inform/entities/leave-request-inform.entity';
 import { LeaveBalanceDto } from './dto/leave-balance.dto';
 import { UpdateLeaveRequestStatusDto } from './dto/update-leave-request-status.dto';
-import { ProducerService } from 'src/kafka/producers/producer.service';
-import { KAFKA_TOPICS } from 'src/kafka/config/kafka-topics.constant';
+import { ProducerService } from '../../kafka/producers/producer.service';
+import { KAFKA_TOPICS } from '../../kafka/config/kafka-topics.constant';
 
 @Injectable()
 export class LeaveRequestsService {
