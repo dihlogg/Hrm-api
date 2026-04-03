@@ -1,5 +1,5 @@
-import { BaseEntities } from 'src/common/entities/base.entity';
-import { Role } from 'src/modules/roles/entities/role.entity';
+import { BaseEntities } from '../../../../common/entities/base.entity';
+import { Role } from '../../../roles/entities/role.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Permission } from '../../entities/permission.entity';
 

@@ -3,8 +3,8 @@ import { LeaveRequestInformService } from './leave-request-inform.service';
 import { LeaveRequestInformController } from './leave-request-inform.controller';
 import { LeaveRequestParticipants } from './entities/leave-request-inform.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from 'src/modules/auth/auth.module';
-import { PermissionsModule } from 'src/modules/permissions/permissions.module';
+import { PermissionsModule } from '../../permissions/permissions.module';
+import { AuthModule } from '../../auth/auth.module';
 
 @Module({
   imports: [

@@ -16,11 +16,11 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/employee.entity';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { PermissionsGuard } from 'src/common/guards/permissions.guard';
-import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../common/guards/permissions.guard';
+import { Permissions } from '../../common/decorators/permissions.decorator';
 import { GetEmployeeListDto } from './dto/get-employee-list.dto';
-import { PaginationDto } from 'src/common/utils/pagination/pagination.dto';
+import { PaginationDto } from '../../common/utils/pagination/pagination.dto';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)

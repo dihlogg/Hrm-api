@@ -1,6 +1,6 @@
-import { BaseEntities } from 'src/common/entities/base.entity';
-import { RolePermission } from 'src/modules/permissions/role-permission/entities/role-permission.entity';
-import { UserRole } from 'src/modules/user-role/entities/user-role.entity';
+import { BaseEntities } from '../../../common/entities/base.entity';
+import { RolePermission } from '../../permissions/role-permission/entities/role-permission.entity';
+import { UserRole } from '../../user-role/entities/user-role.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity('Roles')

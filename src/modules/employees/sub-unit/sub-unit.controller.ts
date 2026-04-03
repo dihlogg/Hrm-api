@@ -15,9 +15,9 @@ import { SubUnitService } from './sub-unit.service';
 import { SubUnit } from './entities/sub-unit.entity';
 import { CreateSubUnitDto } from './dto/create-sub-unit.dto';
 import { UpdateSubUnitDto } from './dto/update-sub-unit.dto';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { PermissionsGuard } from 'src/common/guards/permissions.guard';
-import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../../common/guards/permissions.guard';
+import { Permissions } from '../../../common/decorators/permissions.decorator';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)

@@ -8,7 +8,7 @@ import {
 } from "kafkajs";
 import * as retry from "async-retry";
 import { IConsumer } from "./interfaces/consumer.interface";
-import { sleep } from "src/common/utils/sleep";
+import { sleep } from "../common/utils/sleep";
 import { DlqService } from "./dlq/dlq-handler.service";
 
 export class KafkaConsumer implements IConsumer {

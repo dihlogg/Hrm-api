@@ -12,7 +12,7 @@ import { LeaveRequestTypeModule } from './leave-request-type/leave-request-type.
 import { AuthModule } from '../auth/auth.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { LeavePolicyModule } from './leave-policy/leave-policy.module';
-import { KafkaModule } from 'src/kafka/kafka.module';
+import { KafkaModule } from '../../kafka/kafka.module';
 
 @Module({
   imports: [

@@ -7,8 +7,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { PermissionsModule } from '../permissions/permissions.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from '../users/users.module';
-import { RedisModule } from 'src/redis/redis.module';
 import { EmployeesModule } from '../employees/employees.module';
+import { RedisModule } from '../../redis/redis.module';
 
 @Global()
 @Module({

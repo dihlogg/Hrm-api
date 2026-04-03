@@ -1,7 +1,3 @@
-import { BaseEntities } from 'src/common/entities/base.entity';
-import { JobTitle } from 'src/modules/employees/job-title/entities/job-title.entity';
-import { SubUnit } from 'src/modules/employees/sub-unit/entities/sub-unit.entity';
-import { User } from 'src/modules/users/entities/user.entity';
 import {
   Column,
   Entity,
@@ -11,8 +7,12 @@ import {
   OneToOne,
 } from 'typeorm';
 import { EmployeeStatus } from '../employee-status/entities/employee-status.entity';
-import { LeaveRequest } from 'src/modules/leave-requests/entities/leave-request.entity';
-import { LeaveRequestParticipants } from 'src/modules/leave-requests/leave-request-inform/entities/leave-request-inform.entity';
+import { BaseEntities } from '../../../common/entities/base.entity';
+import { JobTitle } from '../job-title/entities/job-title.entity';
+import { SubUnit } from '../sub-unit/entities/sub-unit.entity';
+import { User } from '../../users/entities/user.entity';
+import { LeaveRequest } from '../../leave-requests/entities/leave-request.entity';
+import { LeaveRequestParticipants } from '../../leave-requests/leave-request-inform/entities/leave-request-inform.entity';
 
 @Entity('Employees')
 export class Employee extends BaseEntities {

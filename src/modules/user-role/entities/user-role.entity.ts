@@ -1,6 +1,6 @@
-import { BaseEntities } from 'src/common/entities/base.entity';
-import { Role } from 'src/modules/roles/entities/role.entity';
-import { User } from 'src/modules/users/entities/user.entity';
+import { BaseEntities } from '../../../common/entities/base.entity';
+import { Role } from '../../roles/entities/role.entity';
+import { User } from '../../users/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity('UserRole')

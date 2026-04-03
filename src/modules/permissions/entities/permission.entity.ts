@@ -1,4 +1,4 @@
-import { BaseEntities } from 'src/common/entities/base.entity';
+import { BaseEntities } from '../../../common/entities/base.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { RolePermission } from '../role-permission/entities/role-permission.entity';
 import { UserPermission } from '../user-permission/entities/user-permission.entity';

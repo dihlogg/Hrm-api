@@ -17,11 +17,11 @@ import { CreateLeaveRequestDto } from './dto/create-leave-request.dto';
 import { UpdateLeaveRequestDto } from './dto/update-leave-request.dto';
 import { LeaveRequest } from './entities/leave-request.entity';
 import { GetLeaveRequestListDto } from './dto/get-leave-request-list.dto';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { PermissionsGuard } from 'src/common/guards/permissions.guard';
-import { Permissions } from 'src/common/decorators/permissions.decorator';
-import { LeaveRequestFilterInterceptor } from 'src/common/interceptors/leave-request-filter.interceptor';
+import { PermissionsGuard } from '../../common/guards/permissions.guard';
+import { Permissions } from '../../common/decorators/permissions.decorator';
+import { LeaveRequestFilterInterceptor } from '../../common/interceptors/leave-request-filter.interceptor';
 import { UpdateLeaveRequestStatusDto } from './dto/update-leave-request-status.dto';
 
 @ApiBearerAuth()

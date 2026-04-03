@@ -14,9 +14,9 @@ import { CreateLeaveStatusDto } from './dto/create-leave-status.dto';
 import { UpdateLeaveStatusDto } from './dto/update-leave-status.dto';
 import { LeaveStatus } from './entities/leave-status.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { PermissionsGuard } from 'src/common/guards/permissions.guard';
-import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../../common/guards/permissions.guard';
+import { Permissions } from '../../../common/decorators/permissions.decorator';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)

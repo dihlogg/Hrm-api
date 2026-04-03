@@ -3,7 +3,7 @@ import { UserPermissionService } from './user-permission.service';
 import { UserPermissionController } from './user-permission.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserPermission } from './entities/user-permission.entity';
-import { AuthModule } from 'src/modules/auth/auth.module';
+import { AuthModule } from '../../auth/auth.module';
 import { PermissionsModule } from '../permissions.module';
 
 @Module({

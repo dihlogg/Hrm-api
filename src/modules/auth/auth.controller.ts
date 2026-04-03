@@ -4,7 +4,7 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { EmployeesService } from '../employees/employees.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 @Controller('Auth')
 export class AuthController {

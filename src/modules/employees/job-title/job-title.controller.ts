@@ -14,9 +14,9 @@ import { CreateJobTitleDto } from './dto/create-job-title.dto';
 import { UpdateJobTitleDto } from './dto/update-job-title.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JobTitle } from './entities/job-title.entity';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { PermissionsGuard } from 'src/common/guards/permissions.guard';
-import { Permissions } from 'src/common/decorators/permissions.decorator';
+import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../../common/guards/permissions.guard';
+import { Permissions } from '../../../common/decorators/permissions.decorator';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
