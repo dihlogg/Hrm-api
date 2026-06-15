@@ -14,6 +14,7 @@ import {
 import { EmployeesService } from './employees.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Employee } from './entities/employee.entity';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -61,6 +62,20 @@ export class EmployeesController {
     @Body() createEmployeeDto: CreateEmployeeDto,
   ): Promise<Employee> {
     return await this.employeesService.create(createEmployeeDto);
+  }
+
+  //create user account for existing employee
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('employee:update')
+  @Post('CreateUserAccount/:id')
+  async createUserAccount(
+    @Param('id') id: string,
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<boolean> {
+    return await this.employeesService.createUserAccountForEmployee(
+      id,
+      createUserDto,
+    );
   }
 
   //update employee
