@@ -26,7 +26,7 @@ export class EmployeesService {
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
     private readonly cloudinaryService: CloudinaryService,
-  ) {}
+  ) { }
 
   async create(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
     return await this.dataSource.transaction(async (manager) => {
@@ -67,10 +67,42 @@ export class EmployeesService {
 
       const newUser = await this.usersService.create(createUserDto, manager);
       employee.userId = newUser.id;
-      
+
+      const officialStatus = await manager.getRepository(EmployeeStatus).findOne({ where: { statusCode: 'OFFICIAL' } });
+      if (officialStatus) {
+        employee.employeeStatusId = officialStatus.id;
+      }
+
       await manager.getRepository(Employee).save(employee);
       return true;
     });
+  }
+
+  async handleCandidateHiredEvent(payload: any) {
+    try {
+      const { firstName, lastName, email, phoneNumber, jobTitleId, subUnitId } = payload;
+
+      const tempStatus = await this.employeeStatusRepo.findOne({
+        where: { statusCode: 'TEMPORARY' },
+      });
+
+      const employee = this.repo.create({
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        jobTitleId,
+        subUnitId,
+        employeeStatusId: tempStatus?.id,
+      });
+
+      await this.repo.save(employee);
+      console.log(`Successfully created temporary employee for hired candidate: ${email}`);
+    } catch (error) {
+      console.error('Failed to create employee from candidate hired event:', error);
+      // Let it throw or handle DLQ logic later if needed
+      throw error;
+    }
   }
 
   async getPaginatedEmployees(dto: PaginationDto) {

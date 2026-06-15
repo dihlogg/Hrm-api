@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { EmployeesController } from './employees.controller';
+import { EmployeesConsumerController } from './employees-consumer.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Employee } from './entities/employee.entity';
 import { JobTitleModule } from './job-title/job-title.module';
@@ -11,7 +12,7 @@ import { CloudinaryModule } from '../../cloudinary/cloudinary.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Employee]), JobTitleModule, SubUnitModule, UsersModule, EmployeeStatusModule, CloudinaryModule],
-  controllers: [EmployeesController],
+  controllers: [EmployeesController, EmployeesConsumerController],
   providers: [EmployeesService],
   exports: [TypeOrmModule, EmployeesService],
 })
