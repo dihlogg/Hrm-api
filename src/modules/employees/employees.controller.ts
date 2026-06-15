@@ -28,7 +28,7 @@ import { PaginationDto } from '../../common/utils/pagination/pagination.dto';
 @ApiTags('Employees')
 @Controller('Employees')
 export class EmployeesController {
-  constructor(private readonly employeesService: EmployeesService) {}
+  constructor(private readonly employeesService: EmployeesService) { }
 
   //get all employees
   @UseGuards(JwtAuthGuard, PermissionsGuard)
