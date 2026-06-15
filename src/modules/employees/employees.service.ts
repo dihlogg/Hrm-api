@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Employee } from './entities/employee.entity';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -48,6 +49,27 @@ export class EmployeesService {
 
       const employee = manager.getRepository(Employee).create(employeeToCreate);
       return await manager.getRepository(Employee).save(employee);
+    });
+  }
+
+  async createUserAccountForEmployee(
+    id: string,
+    createUserDto: CreateUserDto,
+  ): Promise<boolean> {
+    return await this.dataSource.transaction(async (manager) => {
+      const employee = await manager.getRepository(Employee).findOne({ where: { id } });
+      if (!employee) {
+        throw new NotFoundException('Employee not found');
+      }
+      if (employee.userId) {
+        throw new BadRequestException('This employee already has a user account linked');
+      }
+
+      const newUser = await this.usersService.create(createUserDto, manager);
+      employee.userId = newUser.id;
+      
+      await manager.getRepository(Employee).save(employee);
+      return true;
     });
   }
 
