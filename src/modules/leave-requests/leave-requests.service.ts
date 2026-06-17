@@ -41,7 +41,7 @@ export class LeaveRequestsService {
     @InjectRepository(LeaveRequestParticipants)
     private readonly participantsRepo: Repository<LeaveRequestParticipants>,
     private readonly kafkaProducer: ProducerService
-  ) {}
+  ) { }
 
   async findAll(): Promise<LeaveRequest[]> {
     return await this.repo.find();
@@ -482,6 +482,51 @@ export class LeaveRequestsService {
         '(director.id = :directorId OR employee.supervisor = :directorId)',
         { directorId },
       );
+
+    query = this.applyFilters(query, dto);
+    query = this.applySorting(query, dto);
+
+    return paginateAndFormat(query, {
+      page: Number(page),
+      pageSize: Number(pageSize),
+      useQueryBuilder: true,
+      queryBuilder: query,
+    });
+  }
+
+  async getMyPendingRequests(
+    employeeId: string,
+    dto: GetLeaveRequestListDto,
+  ) {
+    const { page = 1, pageSize = 10 } = dto;
+
+    let query = this.buildBaseQuery()
+      .where('leaveRequest.employeeId = :employeeId', { employeeId })
+      .andWhere('leaveStatus.statusCode = :statusCode', {
+        statusCode: 'PENDING',
+      });
+
+    query = this.applyFilters(query, dto);
+    query = this.applySorting(query, dto);
+
+    return paginateAndFormat(query, {
+      page: Number(page),
+      pageSize: Number(pageSize),
+      useQueryBuilder: true,
+      queryBuilder: query,
+    });
+  }
+
+  async getReceiveRequests(
+    employeeId: string,
+    dto: GetLeaveRequestListDto,
+  ) {
+    const { page = 1, pageSize = 10 } = dto;
+
+    let query = this.buildBaseQuery().where(
+      '(leaveRequest.expectedApproverId = :employeeId OR leaveRequest.expectedConfirmId = :employeeId OR leaveRequest.expectedInformToId = :employeeId)',
+      { employeeId },
+    );
 
     query = this.applyFilters(query, dto);
     query = this.applySorting(query, dto);

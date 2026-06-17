@@ -144,6 +144,28 @@ export class LeaveRequestsController {
     );
   }
 
+  // get my pending requests
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
+  @Get('GetMyPendingRequests/:employeeId')
+  async getMyPendingRequests(
+    @Param('employeeId') employeeId: string,
+    @Query() query: GetLeaveRequestListDto,
+  ) {
+    return this.leaveRequestsService.getMyPendingRequests(employeeId, query);
+  }
+
+  // get receive requests
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
+  @Get('GetReceiveRequests/:employeeId')
+  async getReceiveRequests(
+    @Param('employeeId') employeeId: string,
+    @Query() query: GetLeaveRequestListDto,
+  ) {
+    return this.leaveRequestsService.getReceiveRequests(employeeId, query);
+  }
+
   //update leave request status
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('leave-request:update')
