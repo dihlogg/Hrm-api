@@ -327,6 +327,7 @@ export class EmployeesService {
       employeeStatus: 'employeeStatus.name',
       jobTitle: 'jobTitle.name',
       subUnit: 'subUnit.name',
+      createDate: 'employee.createDate',
     };
 
     if (!dto.sortBy || !dto.sortOrder) {

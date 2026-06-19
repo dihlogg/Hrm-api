@@ -178,4 +178,23 @@ export class LeaveRequestsController {
     const actorId = req.user.userId;
     return this.leaveRequestsService.updateLeaveRequestStatus(id, dto, actorId);
   }
+
+  // get leave request stats
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
+  @Get('GetLeaveRequestStats')
+  async getLeaveRequestStats(
+    @Query('employeeId') employeeId?: string,
+    @Query('supervisorId') supervisorId?: string,
+  ) {
+    return this.leaveRequestsService.getLeaveRequestStats(employeeId, supervisorId);
+  }
+
+  // get company leave fund stats
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('leave-request:read')
+  @Get('GetCompanyLeaveFundStats')
+  async getCompanyLeaveFundStats() {
+    return this.leaveRequestsService.getCompanyLeaveFundStats();
+  }
 }
