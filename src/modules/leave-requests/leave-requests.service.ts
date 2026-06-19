@@ -612,4 +612,44 @@ export class LeaveRequestsService {
 
     return query.orderBy(sortField, sortOrder);
   }
+
+  async getLeaveRequestStats(employeeId?: string, supervisorId?: string) {
+    let query = this.repo
+      .createQueryBuilder('leaveRequest')
+      .leftJoin('leaveRequest.leaveStatus', 'leaveStatus')
+      .leftJoin('leaveRequest.employee', 'employee')
+      .select('leaveStatus.statusCode', 'status')
+      .addSelect('COUNT(leaveRequest.id)', 'count');
+
+    if (employeeId) {
+      query = query.where('leaveRequest.employeeId = :employeeId', { employeeId });
+    } else if (supervisorId) {
+      query = query.where('employee.parentId = :supervisorId', { supervisorId });
+    }
+
+    return await query.groupBy('leaveStatus.statusCode').getRawMany();
+  }
+
+  async getCompanyLeaveFundStats() {
+    const totalEmployees = await this.employeeRepo.count();
+    const leaveTypes = await this.leaveRequestTypeRepo.find();
+    
+    const totalAllowedQuotas = leaveTypes.reduce((sum, type) => sum + Number(type.maximumAllowed || 0), 0) * totalEmployees;
+
+    const result = await this.repo
+      .createQueryBuilder('leaveRequest')
+      .leftJoin('leaveRequest.leaveStatus', 'leaveStatus')
+      .where('leaveStatus.name = :statusName', { statusName: 'Approved' })
+      .select('SUM(leaveRequest.duration)', 'totalUsed')
+      .getRawOne();
+
+    const totalUsedQuotas = Number(result?.totalUsed || 0);
+
+    return {
+      totalAllowedQuotas,
+      totalUsedQuotas,
+      remainingQuotas: totalAllowedQuotas - totalUsedQuotas,
+      totalEmployees,
+    };
+  }
 }
