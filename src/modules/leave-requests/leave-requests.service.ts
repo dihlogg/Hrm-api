@@ -80,17 +80,18 @@ export class LeaveRequestsService {
       expectedConfirmId,
     } = createLeaveRequestDto;
 
-    const submittedStatusId = '0579fdeb-881d-4fdb-bde1-d75c4984d9b3';
+    const leaveStatus = await this.leaveStatusRepo.findOne({
+      where: { statusCode: 'SUBMITTED' } // Hoặc 'PENDING' tùy theo DB của bạn
+    });
+
+    if (!leaveStatus) {
+      throw new Error('Leave status with system code SUBMITTED not found');
+    }
 
     return await this.repo.manager.transaction(async (manager) => {
-      const [employee, leaveStatus, leaveReason, partialDay, leaveRequestType] =
+      const [employee, leaveReason, partialDay, leaveRequestType] =
         await Promise.all([
           findEntityOrFail(this.employeeRepo, employeeId, 'Employee'),
-          findEntityOrFail(
-            this.leaveStatusRepo,
-            submittedStatusId,
-            'LeaveStatus',
-          ),
           findEntityOrFail(this.leaveReasonRepo, leaveReasonId, 'LeaveReason'),
           findEntityOrFail(this.partialDayRepo, partialDayId, 'PartialDay'),
           findEntityOrFail(
@@ -633,7 +634,7 @@ export class LeaveRequestsService {
   async getCompanyLeaveFundStats() {
     const totalEmployees = await this.employeeRepo.count();
     const leaveTypes = await this.leaveRequestTypeRepo.find();
-    
+
     const totalAllowedQuotas = leaveTypes.reduce((sum, type) => sum + Number(type.maximumAllowed || 0), 0) * totalEmployees;
 
     const result = await this.repo
