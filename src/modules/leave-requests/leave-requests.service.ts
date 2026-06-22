@@ -218,6 +218,7 @@ export class LeaveRequestsService {
       statusCode,
       actorEmployee,
       leaveRequest,
+      userId,
     );
 
     const actor = await findEntityOrFail(
@@ -306,23 +307,35 @@ export class LeaveRequestsService {
     statusCode: string,
     actorEmployee: Employee,
     leaveRequest: LeaveRequest,
+    userId: string,
   ): Promise<string> {
+    const userRoles = await this.repo.manager.query(`
+      SELECT r.name 
+      FROM "UserRole" ur 
+      JOIN "Roles" r ON ur."roleId" = r.id 
+      WHERE ur."userId" = $1
+    `, [userId]);
+    const roleNames = userRoles.map((r: any) => r.name);
+    const isSuperAdmin = roleNames.includes('Super Admin');
+    const isAdmin = roleNames.includes('Admin');
+
     if (['CONFIRMED', 'PENDING'].includes(statusCode)) {
-      if (actorEmployee.id !== leaveRequest.expectedConfirmId) {
+      if (!isAdmin && !isSuperAdmin) {
+        throw new ForbiddenException('Only Admin can confirm leave requests');
+      }
+      if (actorEmployee.id !== leaveRequest.expectedConfirmId && !isSuperAdmin) {
         throw new ForbiddenException(
           'Only the expected confirmer can perform this action',
         );
       }
-      return leaveRequest.expectedConfirmId;
+      return isSuperAdmin ? actorEmployee.id : leaveRequest.expectedConfirmId;
     }
 
     if (statusCode === 'APPROVED') {
-      if (actorEmployee.id !== leaveRequest.expectedApproverId) {
-        throw new ForbiddenException(
-          'Only the expected approver can perform this action',
-        );
+      if (!isSuperAdmin) {
+        throw new ForbiddenException('Only Super Admin can approve leave requests');
       }
-      return leaveRequest.expectedApproverId;
+      return actorEmployee.id;
     }
 
     if (statusCode === 'REJECTED') {
@@ -331,30 +344,30 @@ export class LeaveRequestsService {
       });
 
       if (currentStatus?.statusCode === 'SUBMITTED') {
-        if (actorEmployee.id !== leaveRequest.expectedConfirmId) {
+        if (actorEmployee.id !== leaveRequest.expectedConfirmId && !isSuperAdmin) {
           throw new ForbiddenException(
             'Only the manager can reject at this stage',
           );
         }
-        return leaveRequest.expectedConfirmId;
+        return isSuperAdmin ? actorEmployee.id : leaveRequest.expectedConfirmId;
       }
 
       if (currentStatus?.statusCode === 'PENDING') {
-        if (actorEmployee.id !== leaveRequest.expectedConfirmId) {
+        if (actorEmployee.id !== leaveRequest.expectedConfirmId && !isSuperAdmin) {
           throw new ForbiddenException(
             'Only the manager can reject at this stage (PENDING)',
           );
         }
-        return leaveRequest.expectedConfirmId;
+        return isSuperAdmin ? actorEmployee.id : leaveRequest.expectedConfirmId;
       }
 
       if (currentStatus?.statusCode === 'CONFIRMED') {
-        if (actorEmployee.id !== leaveRequest.expectedApproverId) {
+        if (actorEmployee.id !== leaveRequest.expectedApproverId && !isSuperAdmin) {
           throw new ForbiddenException(
             'Only the director can reject at this stage',
           );
         }
-        return leaveRequest.expectedApproverId;
+        return isSuperAdmin ? actorEmployee.id : leaveRequest.expectedApproverId;
       }
 
       throw new BadRequestException('Cannot reject from current status');
