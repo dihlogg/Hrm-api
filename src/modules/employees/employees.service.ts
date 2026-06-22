@@ -242,7 +242,7 @@ export class EmployeesService {
       .leftJoin('user.userRole', 'userRole') // join sang UserRole
       .leftJoin('userRole.role', 'role') // join sang Roles
       .where('role.name IN (:...roleNames)', {
-        roleNames: ['Manager', 'Director', 'CEO'],
+        roleNames: ['Admin', 'Super Admin'],
       })
       .getMany();
   }
@@ -257,7 +257,7 @@ export class EmployeesService {
       .leftJoin('user.userRole', 'userRole') // join sang UserRole
       .leftJoin('userRole.role', 'role') // join sang Roles
       .where('employee.subUnitId = :subUnitId', { subUnitId })
-      .andWhere('role.name = :roleName', { roleName: 'Director' })
+      .andWhere('role.name = :roleName', { roleName: 'Super Admin' })
       .getMany();
   }
 
